@@ -4,6 +4,6 @@ Este repositório contém o desenvolvimento de um sistema de gerenciamento para 
 
 ## Diagrama UML
 
-![Diagrama de Classes/UML](./diagrama.png)
+![Diagrama de Classes/UML](./Sala%20and%20Agendamento-2026-03-27-171656.png)
 
 EM BREVE...
