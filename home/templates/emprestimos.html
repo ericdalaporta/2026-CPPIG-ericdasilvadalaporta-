@@ -1,0 +1,73 @@
+{% extends "principal.html" %}
+
+{% block title %}Empréstimos | Chalé Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+	<div>
+		<h2 class="section-title mb-1">Empréstimos (retirada imediata)</h2>
+		<p class="muted mb-0">Registro básico de retirada e previsão de devolução.</p>
+	</div>
+	<span class="badge-soft badge-warn">Empréstimo</span>
+</div>
+
+<section class="row g-3">
+	<div class="col-xl-4">
+		<article class="panel">
+			<div class="panel-body">
+				<h5 class="fw-bold mb-3">Registrar empréstimo</h5>
+				<form class="row g-3">
+					<div class="col-12">
+						<label class="form-label small muted">Solicitante</label>
+						<input type="text" class="form-control" placeholder="Nome">
+					</div>
+					<div class="col-12">
+						<label class="form-label small muted">Cópias para retirada</label>
+						<select class="form-select" multiple>
+						</select>
+						<div class="form-text">Uma pessoa pode retirar vários chalés ao mesmo tempo.</div>
+					</div>
+					<div class="col-sm-6">
+						<label class="form-label small muted">Retirada (agora)</label>
+						<input type="datetime-local" class="form-control">
+					</div>
+					<div class="col-sm-6">
+						<label class="form-label small muted">Devolução prevista</label>
+						<input type="datetime-local" class="form-control">
+					</div>
+					<div class="col-12 d-grid gap-2">
+						<button type="button" class="btn btn-brand">Salvar empréstimo</button>
+						<button type="button" class="btn btn-soft">Registrar devolução</button>
+					</div>
+				</form>
+			</div>
+		</article>
+	</div>
+
+	<div class="col-xl-8">
+		<article class="panel h-100">
+			<div class="panel-body">
+				<h5 class="fw-bold mb-3">Empréstimos em andamento</h5>
+				<div class="table-responsive">
+					<table class="table table-clean">
+						<thead>
+							<tr>
+								<th>Solicitante</th>
+								<th>Cópia</th>
+								<th>Retirada</th>
+								<th>Prevista</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="5" class="text-center muted py-4">Sem empréstimos ainda. O backend exibirá as retiradas aqui.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</article>
+	</div>
+</section>
+{% endblock %}

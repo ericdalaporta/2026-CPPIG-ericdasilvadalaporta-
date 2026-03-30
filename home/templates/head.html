@@ -1,0 +1,263 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Chalé Admin{% endblock %}</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+<style>
+	:root {
+		--ink: #0f172a;
+		--ink-soft: #475569;
+		--line: #dbe4ef;
+		--paper: #ffffff;
+		--mist: #eef3f9;
+		--brand: #0f4c81;
+		--brand-soft: #e7f2ff;
+		--ok: #0f9d58;
+		--warn: #d97706;
+		--danger: #dc2626;
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	body {
+		font-family: "Manrope", sans-serif;
+		margin: 0;
+		color: var(--ink);
+		background:
+			radial-gradient(1200px 500px at -10% -20%, #dfeefe 0%, transparent 65%),
+			radial-gradient(900px 400px at 110% -15%, #e6f6ef 0%, transparent 60%),
+			var(--mist);
+	}
+
+	.layout {
+		min-height: 100vh;
+		display: grid;
+		grid-template-columns: 260px 1fr;
+	}
+
+	.sidebar {
+		background: linear-gradient(180deg, #0f2338 0%, #132d49 100%);
+		color: #dbe8f7;
+		padding: 1.25rem 1rem;
+		border-right: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin-bottom: 1.4rem;
+		font-weight: 700;
+		font-size: 1.03rem;
+		letter-spacing: 0.2px;
+	}
+
+	.brand-mark {
+		width: 34px;
+		height: 34px;
+		border-radius: 10px;
+		display: grid;
+		place-items: center;
+		background: rgba(255, 255, 255, 0.14);
+	}
+
+	.menu-link {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		color: #dbe8f7;
+		text-decoration: none;
+		border-radius: 11px;
+		padding: 0.62rem 0.7rem;
+		font-weight: 600;
+		font-size: 0.93rem;
+		margin-bottom: 0.3rem;
+		transition: all 0.2s ease;
+	}
+
+	.menu-link:hover {
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	.menu-link.active {
+		background: rgba(255, 255, 255, 0.18);
+		color: #ffffff;
+	}
+
+	.main {
+		padding: 1.4rem;
+	}
+
+	.frame {
+		background: var(--paper);
+		border: 1px solid var(--line);
+		border-radius: 18px;
+		min-height: calc(100vh - 2.8rem);
+		overflow: hidden;
+		box-shadow: 0 16px 44px rgba(15, 23, 42, 0.08);
+	}
+
+	.topbar {
+		border-bottom: 1px solid var(--line);
+		background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+		padding: 1rem 1.2rem;
+	}
+
+	.topbar h1 {
+		font-size: 1rem;
+		margin: 0;
+		font-weight: 700;
+	}
+
+	.topbar p {
+		margin: 0;
+		color: var(--ink-soft);
+		font-size: 0.88rem;
+	}
+
+	.content {
+		padding: 1.2rem;
+	}
+
+	.panel {
+		border: 1px solid var(--line);
+		border-radius: 14px;
+		background: #fff;
+		box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+	}
+
+	.panel-body {
+		padding: 1rem;
+	}
+
+	.section-title {
+		font-size: 1.35rem;
+		font-weight: 800;
+		letter-spacing: -0.02em;
+	}
+
+	.kpi-value {
+		font-size: 1.65rem;
+		line-height: 1;
+		font-weight: 800;
+	}
+
+	.icon-dot {
+		width: 40px;
+		height: 40px;
+		border-radius: 12px;
+		display: grid;
+		place-items: center;
+		background: var(--brand-soft);
+		color: var(--brand);
+		font-size: 1rem;
+	}
+
+	.badge-soft {
+		border-radius: 999px;
+		padding: 0.24rem 0.54rem;
+		font-size: 0.73rem;
+		font-weight: 700;
+		letter-spacing: 0.01em;
+		border: 1px solid transparent;
+	}
+
+	.badge-ok {
+		color: var(--ok);
+		background: #ecfdf3;
+		border-color: #b7efd1;
+	}
+
+	.badge-warn {
+		color: var(--warn);
+		background: #fff8eb;
+		border-color: #fde2b5;
+	}
+
+	.badge-danger {
+		color: var(--danger);
+		background: #fff1f1;
+		border-color: #fccdcd;
+	}
+
+	.table-clean {
+		margin: 0;
+	}
+
+	.table-clean th {
+		color: var(--ink-soft);
+		font-size: 0.8rem;
+		font-weight: 700;
+		border-bottom-color: var(--line);
+	}
+
+	.table-clean td {
+		font-size: 0.91rem;
+		vertical-align: middle;
+		border-bottom-color: #edf2f7;
+	}
+
+	.muted {
+		color: var(--ink-soft);
+	}
+
+	.btn-brand {
+		background: var(--brand);
+		color: #fff;
+		border: 1px solid var(--brand);
+	}
+
+	.btn-brand:hover {
+		background: #113f67;
+		color: #fff;
+		border-color: #113f67;
+	}
+
+	.btn-soft {
+		background: #fff;
+		color: var(--brand);
+		border: 1px solid #bfd7f2;
+	}
+
+	.btn-soft:hover {
+		background: #f2f8ff;
+		color: #113f67;
+		border-color: #9fc1e8;
+	}
+
+	.mobile-menu {
+		display: none;
+	}
+
+	@media (max-width: 992px) {
+		.layout {
+			grid-template-columns: 1fr;
+		}
+
+		.sidebar {
+			display: none;
+		}
+
+		.main {
+			padding: 0.8rem;
+		}
+
+		.frame {
+			min-height: auto;
+		}
+
+		.mobile-menu {
+			display: inline-flex;
+		}
+	}
+</style>
+
+{% block extra_css %}{% endblock %}

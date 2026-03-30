@@ -1,13 +1,66 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <p>lsdlklojk</p>
-</body>
-</html>
+{% extends "principal.html" %}
+
+{% block title %}Painel Geral | Chalé Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+    <div>
+        <h2 class="section-title mb-1">Painel Geral</h2>
+        <p class="muted mb-0">Visão rápida de inventário, empréstimos, reservas e atrasos.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'emprestimos' %}" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i>Novo empréstimo</a>
+        <a href="{% url 'reservas' %}" class="btn btn-soft"><i class="bi bi-clock-history me-1"></i>Nova reserva</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-sm-6 col-xl-3">
+        <article class="panel">
+            <div class="panel-body d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="muted small mb-1">Empréstimos ativos</div>
+                    <div class="kpi-value">--</div>
+                </div>
+                <div class="icon-dot"><i class="bi bi-key"></i></div>
+            </div>
+        </article>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <article class="panel">
+            <div class="panel-body d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="muted small mb-1">Reservas futuras</div>
+                    <div class="kpi-value">--</div>
+                </div>
+                <div class="icon-dot"><i class="bi bi-calendar-check"></i></div>
+            </div>
+        </article>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <article class="panel">
+            <div class="panel-body d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="muted small mb-1">Cópias disponíveis</div>
+                    <div class="kpi-value">--</div>
+                </div>
+                <div class="icon-dot"><i class="bi bi-box-seam"></i></div>
+            </div>
+        </article>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <article class="panel">
+            <div class="panel-body d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="muted small mb-1">Atrasos</div>
+                    <div class="kpi-value">--</div>
+                </div>
+                <div class="icon-dot"><i class="bi bi-envelope-exclamation"></i></div>
+            </div>
+        </article>
+    </div>
+</div>
+{% endblock %}

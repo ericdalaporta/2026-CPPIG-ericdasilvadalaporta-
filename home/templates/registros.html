@@ -1,0 +1,35 @@
+{% extends "principal.html" %}
+
+{% block title %}Registros | Chalé Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+	<div>
+		<h2 class="section-title mb-1">Histórico de movimentações</h2>
+		<p class="muted mb-0">Consulta simples do histórico de eventos.</p>
+	</div>
+	<button class="btn btn-soft"><i class="bi bi-funnel me-1"></i>Filtro</button>
+</div>
+
+<article class="panel">
+	<div class="panel-body">
+		<div class="table-responsive">
+			<table class="table table-clean">
+				<thead>
+					<tr>
+						<th>Data</th>
+						<th>Tipo de evento</th>
+						<th>Cópia</th>
+						<th>Descrição</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td colspan="4" class="text-center muted py-4">Sem movimentações ainda. O backend exibirá o histórico completo aqui.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</article>
+{% endblock %}

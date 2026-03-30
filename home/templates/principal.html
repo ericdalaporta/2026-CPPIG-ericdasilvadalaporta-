@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	{% include "head.html" %}
+</head>
+<body>
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="brand">
+				<div class="brand-mark"><i class="bi bi-house-door"></i></div>
+				<span>Chalé Admin</span>
+			</div>
+
+			<a class="menu-link {% if page == 'index' %}active{% endif %}" href="{% url 'index' %}">
+				<i class="bi bi-grid"></i> Início
+			</a>
+			<a class="menu-link {% if page == 'propriedades' %}active{% endif %}" href="{% url 'propriedades' %}">
+				<i class="bi bi-house"></i> Chalés
+			</a>
+			<a class="menu-link {% if page == 'chaves' %}active{% endif %}" href="{% url 'chaves' %}">
+				<i class="bi bi-key-fill"></i> Inventário de chaves
+			</a>
+			<a class="menu-link {% if page == 'reservas' %}active{% endif %}" href="{% url 'reservas' %}">
+				<i class="bi bi-calendar-check"></i> Reservas
+			</a>
+			<a class="menu-link {% if page == 'emprestimos' %}active{% endif %}" href="{% url 'emprestimos' %}">
+				<i class="bi bi-arrow-left-right"></i> Empréstimos
+			</a>
+			<a class="menu-link {% if page == 'registros' %}active{% endif %}" href="{% url 'registros' %}">
+				<i class="bi bi-journal-text"></i> Registros
+			</a>
+		</aside>
+
+		<main class="main">
+			<div class="frame">
+				<header class="topbar d-flex justify-content-between align-items-center gap-3">
+					<div>
+						<h1>Sistema de Controle de Chaves para Aluguel de Chalés</h1>
+						<p>Painel de Acesso ao Sistema</p>
+					</div>
+
+					<button class="btn btn-soft mobile-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-controls="mobileNav">
+						<i class="bi bi-list"></i>
+					</button>
+				</header>
+
+				<section class="content">
+					{% block content %}{% endblock %}
+				</section>
+
+				{% include "footer.html" %}
+			</div>
+		</main>
+	</div>
+
+	<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileNav" aria-labelledby="mobileNavLabel">
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="mobileNavLabel">Menu</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+		</div>
+		<div class="offcanvas-body">
+			<div class="d-grid gap-2">
+				<a class="btn {% if page == 'index' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'index' %}">Início</a>
+				<a class="btn {% if page == 'propriedades' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'propriedades' %}">Chalés</a>
+				<a class="btn {% if page == 'chaves' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'chaves' %}">Inventário</a>
+				<a class="btn {% if page == 'reservas' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'reservas' %}">Reservas</a>
+				<a class="btn {% if page == 'emprestimos' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'emprestimos' %}">Empréstimos</a>
+				<a class="btn {% if page == 'registros' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'registros' %}">Registros</a>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends "principal.html" %}
+
+{% block title %}Propriedades | Chalé Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+  <div>
+    <h2 class="section-title mb-1">Chalés e portões residenciais</h2>
+    <p class="muted mb-0">Cadastro básico de ambientes e classificação.</p>
+  </div>
+  <button class="btn btn-soft"><i class="bi bi-plus-lg me-1"></i>Novo cadastro</button>
+</div>
+
+<section class="row g-3">
+  <div class="col-xl-4">
+    <article class="panel">
+      <div class="panel-body">
+        <h5 class="fw-bold mb-3">Cadastro de chalé/portão</h5>
+        <form class="row g-3">
+          <div class="col-12">
+            <label class="form-label small muted">Nome do chalé/portão</label>
+            <input type="text" class="form-control" placeholder="Ex.: Chalé Araucária 01">
+          </div>
+          <div class="col-12">
+            <label class="form-label small muted">Classificação</label>
+            <select class="form-select">
+              <option>Comum</option>
+              <option>Comunitária</option>
+            </select>
+          </div>
+          <div class="col-12 d-grid">
+            <button type="button" class="btn btn-brand">Salvar cadastro</button>
+          </div>
+        </form>
+      </div>
+    </article>
+  </div>
+
+  <div class="col-xl-8">
+    <article class="panel h-100">
+      <div class="panel-body">
+        <h5 class="fw-bold mb-3">Ambientes cadastrados</h5>
+        <div class="table-responsive">
+          <table class="table table-clean">
+            <thead>
+              <tr>
+                <th>Chalé/Portão</th>
+                <th>Classificação</th>
+                <th>Chave de acesso sugerida</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="3" class="text-center muted py-4">Sem dados ainda. O backend exibirá chalés e portões residenciais aqui.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}
