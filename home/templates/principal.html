@@ -11,22 +11,22 @@
 				<span>Chalé Admin</span>
 			</div>
 
-			<a class="menu-link {% if page == 'index' %}active{% endif %}" href="{% url 'index' %}">
+			<a class="menu-link {% if page == 'index' %}active{% endif %}" href="{% url 'home:index' %}">
 				<i class="bi bi-grid"></i> Início
 			</a>
-			<a class="menu-link {% if page == 'propriedades' %}active{% endif %}" href="{% url 'propriedades' %}">
+			<a class="menu-link {% if page == 'propriedades' %}active{% endif %}" href="{% url 'propriedades:propriedades' %}">
 				<i class="bi bi-house"></i> Chalés
 			</a>
-			<a class="menu-link {% if page == 'chaves' %}active{% endif %}" href="{% url 'chaves' %}">
+			<a class="menu-link {% if page == 'chaves' %}active{% endif %}" href="{% url 'chaves:chaves' %}">
 				<i class="bi bi-key-fill"></i> Inventário de chaves
 			</a>
-			<a class="menu-link {% if page == 'reservas' %}active{% endif %}" href="{% url 'reservas' %}">
+			<a class="menu-link {% if page == 'reservas' %}active{% endif %}" href="{% url 'reservas:reservas' %}">
 				<i class="bi bi-calendar-check"></i> Reservas
 			</a>
-			<a class="menu-link {% if page == 'emprestimos' %}active{% endif %}" href="{% url 'emprestimos' %}">
+			<a class="menu-link {% if page == 'emprestimos' %}active{% endif %}" href="{% url 'emprestimos:emprestimos' %}">
 				<i class="bi bi-arrow-left-right"></i> Empréstimos
 			</a>
-			<a class="menu-link {% if page == 'registros' %}active{% endif %}" href="{% url 'registros' %}">
+			<a class="menu-link {% if page == 'registros' %}active{% endif %}" href="{% url 'registros:registros' %}">
 				<i class="bi bi-journal-text"></i> Registros
 			</a>
 		</aside>
@@ -60,12 +60,12 @@
 		</div>
 		<div class="offcanvas-body">
 			<div class="d-grid gap-2">
-				<a class="btn {% if page == 'index' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'index' %}">Início</a>
-				<a class="btn {% if page == 'propriedades' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'propriedades' %}">Chalés</a>
-				<a class="btn {% if page == 'chaves' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'chaves' %}">Inventário</a>
-				<a class="btn {% if page == 'reservas' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'reservas' %}">Reservas</a>
-				<a class="btn {% if page == 'emprestimos' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'emprestimos' %}">Empréstimos</a>
-				<a class="btn {% if page == 'registros' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'registros' %}">Registros</a>
+				<a class="btn {% if page == 'index' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'home:index' %}">Início</a>
+				<a class="btn {% if page == 'propriedades' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'propriedades:propriedades' %}">Chalés</a>
+				<a class="btn {% if page == 'chaves' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'chaves:chaves' %}">Inventário</a>
+				<a class="btn {% if page == 'reservas' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'reservas:reservas' %}">Reservas</a>
+				<a class="btn {% if page == 'emprestimos' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'emprestimos:emprestimos' %}">Empréstimos</a>
+				<a class="btn {% if page == 'registros' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'registros:registros' %}">Registros</a>
 			</div>
 		</div>
 	</div>
