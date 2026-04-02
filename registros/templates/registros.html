@@ -8,7 +8,7 @@
 		<h2 class="section-title mb-1">Histórico de movimentações</h2>
 		<p class="muted mb-0">Consulta simples do histórico de eventos.</p>
 	</div>
-	<button class="btn btn-soft"><i class="bi bi-funnel me-1"></i>Filtro</button>
+	<a href="{% url 'registros:create' %}" class="btn btn-soft"><i class="bi bi-plus-lg me-1"></i>Novo registro</a>
 </div>
 
 <article class="panel">
@@ -24,9 +24,20 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td colspan="4" class="text-center muted py-4">Sem movimentações ainda. O backend exibirá o histórico completo aqui.</td>
-					</tr>
+					{% if registros %}
+						{% for registro in registros %}
+						<tr>
+							<td>{{ registro.data_evento|date:"d/m/Y H:i" }}</td>
+							<td>{{ registro.get_tipo_evento_display }}</td>
+							<td>{{ registro.copia }}</td>
+							<td>{{ registro.descricao }}</td>
+						</tr>
+						{% endfor %}
+					{% else %}
+						<tr>
+							<td colspan="4" class="text-center muted py-4">Sem movimentações registradas. Clique em "Novo registro" para adicionar.</td>
+						</tr>
+					{% endif %}
 				</tbody>
 			</table>
 		</div>

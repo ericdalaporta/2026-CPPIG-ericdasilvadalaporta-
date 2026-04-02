@@ -8,64 +8,41 @@
     <h2 class="section-title mb-1">Inventário de chaves e cópias</h2>
     <p class="muted mb-0">Cadastro enxuto de chaves, cópias e status.</p>
   </div>
-  <button class="btn btn-soft"><i class="bi bi-plus-lg me-1"></i>Nova cópia</button>
+  <a href="{% url 'chaves:create' %}" class="btn btn-soft"><i class="bi bi-plus-lg me-1"></i>Nova cópia</a>
 </div>
 
-<section class="row g-3">
-  <div class="col-xl-4">
-    <article class="panel">
-      <div class="panel-body">
-        <h5 class="fw-bold mb-3">Cadastro de chave/cópia</h5>
-        <form class="row g-3">
-          <div class="col-12">
-            <label class="form-label small muted">Nome da chave</label>
-            <input type="text" class="form-control" placeholder="Ex.: Chave mestra prédio Y">
-          </div>
-          <div class="col-sm-6">
-            <label class="form-label small muted">ID físico da cópia</label>
-            <input type="text" class="form-control" placeholder="CP-001">
-          </div>
-          <div class="col-sm-6">
-            <label class="form-label small muted">Status</label>
-            <select class="form-select">
-              <option>Disponível</option>
-              <option>Emprestada</option>
-              <option>Reservada</option>
-              <option>Manutenção</option>
-              <option>Perdida</option>
-            </select>
-          </div>
-          <div class="col-12 d-grid">
-            <button type="button" class="btn btn-brand">Salvar cópia</button>
-          </div>
-        </form>
-      </div>
-    </article>
-  </div>
+<article class="panel">
+  <div class="panel-body">
+    <h5 class="fw-bold mb-3">Inventário de cópias</h5>
 
-  <div class="col-xl-8">
-    <article class="panel h-100">
-      <div class="panel-body">
-        <h5 class="fw-bold mb-3">Inventário de cópias</h5>
-
-        <div class="table-responsive">
-          <table class="table table-clean">
-            <thead>
-              <tr>
-                <th>Chave</th>
-                <th>ID da cópia</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="3" class="text-center muted py-4">Sem dados ainda. O backend exibirá o inventário completo aqui.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </article>
+    <div class="table-responsive">
+      <table class="table table-clean">
+        <thead>
+          <tr>
+            <th>Chave</th>
+            <th>ID da cópia</th>
+            <th>Status</th>
+            <th>Propriedade</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if chaves %}
+            {% for chave in chaves %}
+            <tr>
+              <td>{{ chave.nome }}</td>
+              <td>{{ chave.id_fisico }}</td>
+              <td><span class="badge badge-{% if chave.status == 'disponivel' %}ok{% elif chave.status == 'emprestada' %}warn{% else %}danger{% endif %}">{{ chave.get_status_display }}</span></td>
+              <td>{{ chave.propriedade|default:"---" }}</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="4" class="text-center muted py-4">Sem chaves cadastradas. Clique em "Nova cópia" para adicionar.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
   </div>
-</section>
+</article>
 {% endblock %}

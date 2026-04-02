@@ -1,0 +1,34 @@
+{% extends "principal.html" %}
+
+{% block title %}Confirmar Exclusão | Chalé Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center gap-3 mb-4">
+  <div class="text-center">
+    <h2 class="section-title mb-1">Confirmar Exclusão</h2>
+    <p class="muted mb-0">Esta ação não pode ser desfeita!</p>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-xl-6">
+    <article class="panel">
+      <div class="panel-body">
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Tem certeza que deseja excluir a reserva de <strong>{{ object.solicitante }}</strong>?
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-danger">
+              <i class="bi bi-trash me-1"></i> Sim, deletar permanentemente
+            </button>
+            <a href="{% url 'reservas:list' %}" class="btn btn-soft">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </article>
+  </div>
+</div>
+{% endblock %}

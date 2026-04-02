@@ -11,24 +11,84 @@
 				<span>Chalé Admin</span>
 			</div>
 
-			<a class="menu-link {% if page == 'index' %}active{% endif %}" href="{% url 'home:index' %}">
+			<a class="menu-link {% if pagina == 'index' %}active{% endif %}" href="{% url 'home:index' %}">
 				<i class="bi bi-grid"></i> Início
 			</a>
-			<a class="menu-link {% if page == 'propriedades' %}active{% endif %}" href="{% url 'propriedades:propriedades' %}">
-				<i class="bi bi-house"></i> Chalés
-			</a>
-			<a class="menu-link {% if page == 'chaves' %}active{% endif %}" href="{% url 'chaves:chaves' %}">
-				<i class="bi bi-key-fill"></i> Inventário de chaves
-			</a>
-			<a class="menu-link {% if page == 'reservas' %}active{% endif %}" href="{% url 'reservas:reservas' %}">
-				<i class="bi bi-calendar-check"></i> Reservas
-			</a>
-			<a class="menu-link {% if page == 'emprestimos' %}active{% endif %}" href="{% url 'emprestimos:emprestimos' %}">
-				<i class="bi bi-arrow-left-right"></i> Empréstimos
-			</a>
-			<a class="menu-link {% if page == 'registros' %}active{% endif %}" href="{% url 'registros:registros' %}">
-				<i class="bi bi-journal-text"></i> Registros
-			</a>
+
+			<div class="menu-dropdown">
+				<button class="menu-link dropdown-btn" type="button">
+					<i class="bi bi-house"></i> Propriedades
+					<i class="bi bi-chevron-down ms-auto"></i>
+				</button>
+				<div class="dropdown-content">
+					<a href="{% url 'propriedades:list' %}" class="dropdown-item {% if pagina == 'propriedades' %}active{% endif %}">
+						<i class="bi bi-list"></i> Listar
+					</a>
+					<a href="{% url 'propriedades:create' %}" class="dropdown-item">
+						<i class="bi bi-plus-lg"></i> Criar
+					</a>
+				</div>
+			</div>
+
+			<div class="menu-dropdown">
+				<button class="menu-link dropdown-btn" type="button">
+					<i class="bi bi-key-fill"></i> Chaves
+					<i class="bi bi-chevron-down ms-auto"></i>
+				</button>
+				<div class="dropdown-content">
+					<a href="{% url 'chaves:list' %}" class="dropdown-item {% if pagina == 'chaves' %}active{% endif %}">
+						<i class="bi bi-list"></i> Listar
+					</a>
+					<a href="{% url 'chaves:create' %}" class="dropdown-item">
+						<i class="bi bi-plus-lg"></i> Criar
+					</a>
+				</div>
+			</div>
+
+			<div class="menu-dropdown">
+				<button class="menu-link dropdown-btn" type="button">
+					<i class="bi bi-calendar-check"></i> Reservas
+					<i class="bi bi-chevron-down ms-auto"></i>
+				</button>
+				<div class="dropdown-content">
+					<a href="{% url 'reservas:list' %}" class="dropdown-item {% if pagina == 'reservas' %}active{% endif %}">
+						<i class="bi bi-list"></i> Listar
+					</a>
+					<a href="{% url 'reservas:create' %}" class="dropdown-item">
+						<i class="bi bi-plus-lg"></i> Criar
+					</a>
+				</div>
+			</div>
+
+			<div class="menu-dropdown">
+				<button class="menu-link dropdown-btn" type="button">
+					<i class="bi bi-arrow-left-right"></i> Empréstimos
+					<i class="bi bi-chevron-down ms-auto"></i>
+				</button>
+				<div class="dropdown-content">
+					<a href="{% url 'emprestimos:list' %}" class="dropdown-item {% if pagina == 'emprestimos' %}active{% endif %}">
+						<i class="bi bi-list"></i> Listar
+					</a>
+					<a href="{% url 'emprestimos:create' %}" class="dropdown-item">
+						<i class="bi bi-plus-lg"></i> Criar
+					</a>
+				</div>
+			</div>
+
+			<div class="menu-dropdown">
+				<button class="menu-link dropdown-btn" type="button">
+					<i class="bi bi-journal-text"></i> Registros
+					<i class="bi bi-chevron-down ms-auto"></i>
+				</button>
+				<div class="dropdown-content">
+					<a href="{% url 'registros:list' %}" class="dropdown-item {% if pagina == 'registros' %}active{% endif %}">
+						<i class="bi bi-list"></i> Listar
+					</a>
+					<a href="{% url 'registros:create' %}" class="dropdown-item">
+						<i class="bi bi-plus-lg"></i> Criar
+					</a>
+				</div>
+			</div>
 		</aside>
 
 		<main class="main">
@@ -61,16 +121,43 @@
 		<div class="offcanvas-body">
 			<div class="d-grid gap-2">
 				<a class="btn {% if page == 'index' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'home:index' %}">Início</a>
-				<a class="btn {% if page == 'propriedades' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'propriedades:propriedades' %}">Chalés</a>
-				<a class="btn {% if page == 'chaves' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'chaves:chaves' %}">Inventário</a>
-				<a class="btn {% if page == 'reservas' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'reservas:reservas' %}">Reservas</a>
-				<a class="btn {% if page == 'emprestimos' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'emprestimos:emprestimos' %}">Empréstimos</a>
-				<a class="btn {% if page == 'registros' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'registros:registros' %}">Registros</a>
+				<a class="btn {% if page == 'propriedades' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'propriedades:list' %}">Propriedades</a>
+				<a class="btn {% if page == 'chaves' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'chaves:list' %}">Chaves</a>
+				<a class="btn {% if page == 'reservas' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'reservas:list' %}">Reservas</a>
+				<a class="btn {% if page == 'emprestimos' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'emprestimos:list' %}">Empréstimos</a>
+				<a class="btn {% if page == 'registros' %}btn-brand{% else %}btn-soft{% endif %}" href="{% url 'registros:list' %}">Registros</a>
 			</div>
 		</div>
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		// Dropdown menu toggle functionality
+		document.querySelectorAll('.dropdown-btn').forEach(button => {
+			button.addEventListener('click', function(e) {
+				e.preventDefault();
+				const dropdown = this.nextElementSibling;
+				const isOpen = dropdown.classList.contains('show');
+				
+				// Close all other dropdowns
+				document.querySelectorAll('.dropdown-content.show').forEach(d => {
+					if (d !== dropdown) {
+						d.classList.remove('show');
+						d.previousElementSibling.classList.remove('open');
+					}
+				});
+				
+				// Toggle current dropdown
+				if (isOpen) {
+					dropdown.classList.remove('show');
+					this.classList.remove('open');
+				} else {
+					dropdown.classList.add('show');
+					this.classList.add('open');
+				}
+			});
+		});
+	</script>
 	{% block extra_js %}{% endblock %}
 </body>
 </html>
