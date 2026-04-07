@@ -307,6 +307,186 @@
 		border-left-color: #0f4c81;
 	}
 
+	/* Form Styling */
+	.form-label {
+		color: var(--ink);
+		margin-bottom: 0.5rem;
+		font-size: 0.95rem;
+	}
+
+	.form-control,
+	.form-select {
+		border: 1px solid var(--line);
+		border-radius: 10px;
+		padding: 0.65rem 0.85rem;
+		font-size: 0.93rem;
+		font-family: "Manrope", sans-serif;
+		color: var(--ink);
+		background: #ffffff;
+		transition: all 0.2s ease;
+	}
+
+	.form-control:focus,
+	.form-select:focus {
+		border-color: var(--brand);
+		box-shadow: 0 0 0 0.2rem var(--brand-soft);
+		background: #ffffff;
+		color: var(--ink);
+	}
+
+	.form-control::placeholder {
+		color: var(--ink-soft);
+	}
+
+	.form-control:disabled,
+	.form-select:disabled {
+		background: var(--mist);
+		color: var(--ink-soft);
+	}
+
+	textarea.form-control {
+		resize: vertical;
+		min-height: 100px;
+	}
+
+	.form-text {
+		font-size: 0.82rem;
+		color: var(--ink-soft);
+		margin-top: 0.3rem;
+	}
+
+	.form-check-input {
+		width: 1.25em;
+		height: 1.25em;
+		margin-top: 0.3em;
+		border: 1px solid var(--line);
+		border-radius: 4px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.form-check-input:checked {
+		background: var(--brand);
+		border-color: var(--brand);
+	}
+
+	.form-check-input:focus {
+		border-color: var(--brand);
+		box-shadow: 0 0 0 0.25rem var(--brand-soft);
+	}
+
+	.form-check-label {
+		color: var(--ink);
+		font-weight: 500;
+		cursor: pointer;
+		margin-bottom: 0;
+	}
+
+	.invalid-feedback {
+		color: var(--danger);
+		font-size: 0.85rem;
+		margin-top: 0.3rem;
+	}
+
+	/* Form Table Styling */
+	.table-form {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 1rem;
+	}
+
+	.table-form tr {
+		border-bottom: 1px solid var(--line);
+	}
+
+	.table-form tr:last-child {
+		border-bottom: none;
+	}
+
+	.table-form th {
+		padding: 0;
+		text-align: right;
+		font-weight: 600;
+		background: none;
+		border: none;
+	}
+
+	.table-form td {
+		padding: 0.85rem;
+		border: none;
+	}
+
+	.table-form th {
+		padding: 0.85rem;
+		text-align: right;
+		width: 30%;
+		color: var(--ink);
+		font-size: 0.95rem;
+	}
+
+	.table-form td {
+		width: 70%;
+	}
+
+	.table-form input[type="text"],
+	.table-form input[type="email"],
+	.table-form input[type="number"],
+	.table-form input[type="date"],
+	.table-form input[type="datetime-local"],
+	.table-form textarea,
+	.table-form select {
+		width: 100%;
+		padding: 0.65rem 0.85rem;
+		border: 1px solid var(--line);
+		border-radius: 10px;
+		font-family: "Manrope", sans-serif;
+		font-size: 0.93rem;
+		color: var(--ink);
+		background: #ffffff;
+		transition: all 0.2s ease;
+		box-sizing: border-box;
+	}
+
+	.table-form input:focus,
+	.table-form select:focus,
+	.table-form textarea:focus {
+		border-color: var(--brand);
+		box-shadow: 0 0 0 0.2rem var(--brand-soft);
+		outline: none;
+	}
+
+	.table-form textarea {
+		resize: vertical;
+		min-height: 100px;
+	}
+
+	.table-form ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.table-form li {
+		margin: 0;
+		padding: 0;
+	}
+
+	.table-form .errorlist {
+		color: var(--danger);
+		font-size: 0.85rem;
+		margin: 0.3rem 0 0 0;
+		padding: 0;
+	}
+
+	.table-form .errorlist li {
+		margin: 0.2rem 0;
+		list-style: none;
+	}
+
+	.fw-500 {
+		font-weight: 500;
+	}
+
 	@media (max-width: 992px) {
 		.layout {
 			grid-template-columns: 1fr;
