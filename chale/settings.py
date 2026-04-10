@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'reservas',
     'emprestimos',
     'registros',
+    'django_bootstrap5'
 ]
 
 MIDDLEWARE = [

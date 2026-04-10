@@ -6,14 +6,14 @@
 <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
   <div>
     <h2 class="section-title mb-1">Inventário de chaves e cópias</h2>
-    <p class="muted mb-0">Cadastro enxuto de chaves, cópias e status.</p>
+    <p class="muted mb-0">Cadastro de chaves, cópias e status.</p>
   </div>
   <a href="{% url 'chaves:create' %}" class="btn btn-soft"><i class="bi bi-plus-lg me-1"></i>Nova cópia</a>
 </div>
 
 <article class="panel">
   <div class="panel-body">
-    <h5 class="fw-bold mb-3">Inventário de cópias</h5>
+    <h5 class="fw-bold mb-3">Inventário de cópias </h5>
 
     <div class="table-responsive">
       <table class="table table-clean">
@@ -23,6 +23,7 @@
             <th>ID da cópia</th>
             <th>Status</th>
             <th>Propriedade</th>
+            <th>Ações </th>
           </tr>
         </thead>
         <tbody>
@@ -33,11 +34,15 @@
               <td>{{ chave.id_fisico }}</td>
               <td><span class="badge badge-{% if chave.status == 'disponivel' %}ok{% elif chave.status == 'emprestada' %}warn{% else %}danger{% endif %}">{{ chave.get_status_display }}</span></td>
               <td>{{ chave.propriedade|default:"---" }}</td>
+              <td class="d-flex gap-2">
+                <a href="{% url 'chaves:update' chave.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                <a href="{% url 'chaves:delete' chave.pk %}" class="btn btn-danger btn-sm">Excluir</a>
+              </td>
             </tr>
             {% endfor %}
           {% else %}
             <tr>
-              <td colspan="4" class="text-center muted py-4">Sem chaves cadastradas. Clique em "Nova cópia" para adicionar.</td>
+              <td colspan="5" class="text-center muted py-4">Sem chaves cadastradas. Clique em "Nova cópia" para adicionar.</td>
             </tr>
           {% endif %}
         </tbody>

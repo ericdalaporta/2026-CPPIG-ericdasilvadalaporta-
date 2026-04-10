@@ -19,17 +19,16 @@ class CriarPropriedade(CreateView):
     model = Propriedade
     form_class = PropriedadeForm
     template_name = 'propriedade_form.html'
-    success_url = reverse_lazy('propriedades:list')
+    success_url = reverse_lazy('propriedades')
 
 
 class EditarPropriedade(UpdateView):
     model = Propriedade
     form_class = PropriedadeForm
     template_name = 'propriedade_form.html'
-    success_url = reverse_lazy('propriedades:list')
-
+    success_url = reverse_lazy('propriedades')
 
 class DeletarPropriedade(DeleteView):
     model = Propriedade
     template_name = 'propriedade_confirm_delete.html'
-    success_url = reverse_lazy('propriedades:list')
+    success_url = reverse_lazy('propriedades')

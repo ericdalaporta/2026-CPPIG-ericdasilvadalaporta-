@@ -4,13 +4,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin', admin.site.urls),
     path('', include('home.urls')),
-    path('propriedades/', include('propriedades.urls')),
-    path('chaves/', include('chaves.urls')),
-    path('reservas/', include('reservas.urls')),
-    path('emprestimos/', include('emprestimos.urls')),
-    path('registros/', include('registros.urls')),
+    path('', include('propriedades.urls')),
+    path('', include('chaves.urls')),
+    path('', include('reservas.urls')),
+    path('', include('emprestimos.urls')),
+    path('', include('registros.urls')),
 ]
 
 if settings.DEBUG:
