@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="pt-br" data-bs-theme="light">
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% block head %}
 {% include "head.html" %}
 {% endblock head %}
@@ -24,18 +24,16 @@
 
             <ul class="navbar-nav ms-auto">
 
-                <!-- CLIENTES -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
                         Clientes
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Cadastrar Cliente</a></li>
-                        <li><a class="dropdown-item" href="#">Listar Clientes</a></li>
+                        <li><a class="dropdown-item" href="{% url 'cliente_adicionar' %}">Cadastrar Cliente</a></li>
+                        <li><a class="dropdown-item" href="{% url 'clientes' %}">Listar Clientes</a></li>
                     </ul>
                 </li>
 
-                <!-- PROPRIEDADES -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
                         Propriedades
@@ -46,7 +44,6 @@
                     </ul>
                 </li>
 
-                <!-- CHAVES -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
                         Chaves
@@ -57,7 +54,6 @@
                     </ul>
                 </li>
 
-                <!-- CÓPIAS -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
                         Cópias
@@ -68,7 +64,6 @@
                     </ul>
                 </li>
 
-                <!-- EMPRÉSTIMOS -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
                         Empréstimos
@@ -79,7 +74,6 @@
                     </ul>
                 </li>
 
-                <!-- RESERVAS -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
                         Reservas

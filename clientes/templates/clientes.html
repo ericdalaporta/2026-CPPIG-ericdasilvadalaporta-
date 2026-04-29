@@ -1,0 +1,81 @@
+{% extends 'principal.html' %}
+{% load static %}
+{% block content %}
+
+<section class="section">
+    <div class="container">
+
+        <!-- BUSCA -->
+        <form method="GET">
+            <div class="row p-3 align-items-center">
+                <label class="col-md-2 col-form-label fw-bold">Nome:</label>
+
+                <div class="col-md-8">
+                    <input class="form-control" type="text" name="buscar"
+                           value="{{ request.GET.buscar }}"
+                           placeholder="Digite o nome do cliente">
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- CARD -->
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+
+                <h3 class="text-center mb-4">Clientes Cadastrados</h3>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center">
+
+                        <!-- 🔵 azul no lugar do verde -->
+                        <thead class="table-primary">
+                            <tr>
+                                <th class="text-start">Nome</th>
+                                <th>Telefone</th>
+                                <th>Email</th>
+                                <th style="width: 100px;">Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for cliente in object_list %}
+                                <tr>
+                                    <td class="text-start">{{ cliente.nome }}</td>
+                                    <td>{{ cliente.telefone }}</td>
+                                    <td>{{ cliente.email }}</td>
+
+                                    <td>
+                                        <!-- ÍCONE EDITAR -->
+                                        <a href="{% url 'cliente_editar' cliente.pk %}" class="text-primary me-2">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <!-- ÍCONE EXCLUIR -->
+                                        <a href="{% url 'cliente_apagar' cliente.pk %}" class="text-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4">Nenhum cliente cadastrado</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
