@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pt-br" data-bs-theme="light">
+
+{% block head %}
+{% include "head.html" %}
+{% endblock head %}
+
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white border-bottom">
+    <div class="container">
+
+        <a class="navbar-brand text-dark fw-bold" href="{% url 'index' %}">
+            Início
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav ms-auto">
+
+                <!-- CLIENTES -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
+                        Clientes
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Cadastrar Cliente</a></li>
+                        <li><a class="dropdown-item" href="#">Listar Clientes</a></li>
+                    </ul>
+                </li>
+
+                <!-- PROPRIEDADES -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
+                        Propriedades
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Cadastrar Propriedade</a></li>
+                        <li><a class="dropdown-item" href="#">Listar Propriedades</a></li>
+                    </ul>
+                </li>
+
+                <!-- CHAVES -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
+                        Chaves
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Cadastrar Chave</a></li>
+                        <li><a class="dropdown-item" href="#">Listar Chaves</a></li>
+                    </ul>
+                </li>
+
+                <!-- CÓPIAS -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
+                        Cópias
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Cadastrar Cópia</a></li>
+                        <li><a class="dropdown-item" href="#">Listar Cópias</a></li>
+                    </ul>
+                </li>
+
+                <!-- EMPRÉSTIMOS -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
+                        Empréstimos
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Cadastrar Empréstimo</a></li>
+                        <li><a class="dropdown-item" href="#">Listar Empréstimos</a></li>
+                    </ul>
+                </li>
+
+                <!-- RESERVAS -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
+                        Reservas
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Cadastrar Reserva</a></li>
+                        <li><a class="dropdown-item" href="#">Listar Reservas</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+</body>
+</html>
