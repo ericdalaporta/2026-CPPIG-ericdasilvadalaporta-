@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-INSTALLED_APPS += ['django_bootstrap5', 'django_seed', ]
+INSTALLED_APPS += ['django_bootstrap5', 'django_seed', 'stdimage', ]
 
 INSTALLED_APPS += ['home', 'chaves', 'clientes', 'emprestimos', 'propriedades', 'reservas', ]
 
@@ -119,7 +119,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [BASE_DIR / 'static',]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_ROOT = BASE_DIR / 'media'

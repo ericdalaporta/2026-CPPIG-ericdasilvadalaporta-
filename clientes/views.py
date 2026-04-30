@@ -12,22 +12,23 @@ from .forms import ClienteModelForm
 class ClientesView(ListView):
     model = Cliente
     template_name = 'clientes.html'
+    context_object_name = 'object_list'
+    paginate_by = 10
 
     def get_queryset(self):
         buscar = self.request.GET.get('buscar')
-        qs = super().get_queryset()
+        qs = Cliente.objects.all()
 
         if buscar:
             qs = qs.filter(nome__icontains=buscar)
 
-        if qs.count() > 0:
-            paginator = Paginator(qs, 10)
-            page = self.request.GET.get('page')
-            return paginator.get_page(page)
-        else:
-            messages.info(self.request, 'Não existem clientes cadastrados!')
-            return qs
+        return qs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if not context['object_list'] and self.request.GET.get('buscar'):
+            messages.info(self.request, 'Não existem clientes cadastrados com esse nome!')
+        return context
 
 class ClienteAddView(SuccessMessageMixin, CreateView):
     model = Cliente
@@ -45,10 +46,7 @@ class ClienteUpdateView(SuccessMessageMixin, UpdateView):
     success_message = 'Cliente alterado com sucesso!'
 
 
-
-
 class ClienteDeleteView(DeleteView):
     model = Cliente
     template_name = 'cliente_apagar.html'
     success_url = reverse_lazy('clientes')
-    success_message = 'Cliente apagado com sucesso!'

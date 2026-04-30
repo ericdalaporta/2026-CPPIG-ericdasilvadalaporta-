@@ -38,7 +38,7 @@
                                 <th class="text-start">Nome</th>
                                 <th>Telefone</th>
                                 <th>Email</th>
-                                <th style="width: 120px;">Ações</th>
+                                <th style="width: 150px;">Ações</th>
                             </tr>
                         </thead>
 
@@ -54,11 +54,51 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <a href="{% url 'cliente_apagar' cliente.pk %}" class="text-danger">
+                                        <a href="{% url 'cliente_apagar' cliente.pk %}" class="text-danger me-2">
                                             <i class="fas fa-trash"></i>
+                                        </a>
+
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ cliente.id }}" class="text-secondary">
+                                            <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
+
+                                <!-- MODAL -->
+                                <div class="modal fade" id="modal{{ cliente.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Cliente: {{ cliente.nome }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+
+                                            <div class="modal-body text-center">
+
+                                                {% if cliente.foto.url is not empty %}
+                                                    <img src="{{ cliente.foto.url }}"
+                                                         class="img-thumbnail mb-3"
+                                                         width="150" height="150">
+                                                {% else %}
+                                                    <p>Sem foto</p>
+                                                {% endif %}
+
+                                                <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+                                                <p><strong>Email:</strong> {{ cliente.email }}</p>
+
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Fechar
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
                             {% empty %}
                                 <tr>
                                     <td colspan="4">Nenhum cliente cadastrado</td>
@@ -71,7 +111,7 @@
 
                 <!-- PAGINAÇÃO -->
                 <div class="d-flex justify-content-center mt-3">
-                    {% bootstrap_pagination object_list %}
+                    {% bootstrap_pagination page_obj %}
                 </div>
 
             </div>
