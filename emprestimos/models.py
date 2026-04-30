@@ -3,8 +3,8 @@ from datetime import date
 
 
 class Emprestimo(models.Model):
-    data_retirada = models.DateField('Data de Retirada', help_text='Data da retirada do empréstimo')
-    data_prevista = models.DateField('Data Prevista', help_text='Data prevista de devolução')
+    data_retirada = models.DateField('Data de Retirada', blank=False, help_text='Data da retirada do empréstimo')
+    data_prevista = models.DateField('Data Prevista', blank=False, help_text='Data prevista de devolução')
     data_devolucao = models.DateField('Data de Devolução', null=True, blank=True, help_text='Data da devolução do empréstimo')
     multa = models.IntegerField('Multa', default=0, help_text='Multa por atraso')
 
@@ -32,3 +32,15 @@ class Emprestimo(models.Model):
         if self.esta_atrasado():
             return (date.today() - self.data_prevista).days
         return 0
+    
+    def toggle_status(self):
+        """Marca como devolvido ou volta a pendente"""
+        if self.data_devolucao is None:
+            self.data_devolucao = date.today()
+        else:
+            self.data_devolucao = None
+        self.save()
+    
+    def get_status(self):
+        """Retorna o status do empréstimo"""
+        return 'Devolvida' if self.data_devolucao else 'Pendente'

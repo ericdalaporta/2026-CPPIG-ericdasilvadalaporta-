@@ -45,10 +45,14 @@ class PropriedadeUpdateView(SuccessMessageMixin, UpdateView):
     success_message = 'Propriedade alterada com sucesso!'
 
 
-class PropriedadeDeleteView(DeleteView):
+class PropriedadeDeleteView(SuccessMessageMixin, DeleteView):
     model = Propriedade
     template_name = 'propriedade_apagar.html'
     success_url = reverse_lazy('propriedades')
+    
+    def get_success_message(self, cleaned_data):
+        propriedade = self.object
+        return f'Propriedade "{propriedade.nome}" foi deletada com sucesso!'
 
 
 class PropriedadeToggleStatusView(View):

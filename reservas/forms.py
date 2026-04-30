@@ -8,8 +8,9 @@ class ReservaModelForm(forms.ModelForm):
         model = Reserva
         fields = '__all__'
         widgets = {
-            'data_inicio': DateInput(attrs={'type': 'date'}),
-            'data_fim': DateInput(attrs={'type': 'date'}),
+            'data_inicio': DateInput(attrs={'type': 'date', 'class': 'form-control', 'required': False}),
+            'data_fim': DateInput(attrs={'type': 'date', 'class': 'form-control', 'required': False}),
+            'status': forms.TextInput(attrs={'class': 'form-control', 'required': False}),
         }
 
         error_messages = {

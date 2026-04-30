@@ -16,7 +16,7 @@
                 Confirma a exclusão do empréstimo: <strong>{{ object }}</strong>?
             </p>
 
-            <form method="POST">
+            <form method="POST" novalidate>
                 {% csrf_token %}
 
                 <div class="text-end">

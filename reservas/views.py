@@ -35,7 +35,11 @@ class ReservaUpdateView(SuccessMessageMixin, UpdateView):
     success_message = 'Reserva alterada com sucesso!'
 
 
-class ReservaDeleteView(DeleteView):
+class ReservaDeleteView(SuccessMessageMixin, DeleteView):
     model = Reserva
     template_name = 'reserva_apagar.html'
     success_url = reverse_lazy('reservas')
+    
+    def get_success_message(self, cleaned_data):
+        reserva = self.object
+        return f'Reserva "{reserva.id}" foi deletada com sucesso!'

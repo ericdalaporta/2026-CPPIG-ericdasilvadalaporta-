@@ -14,7 +14,7 @@
                 Confirma a exclusão da propriedade: <strong>{{ object }}</strong>?
             </p>
 
-            <form method="POST">
+            <form method="POST" novalidate>
                 {% csrf_token %}
 
                 <div class="text-end">

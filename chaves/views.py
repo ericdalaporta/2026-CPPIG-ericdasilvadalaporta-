@@ -46,10 +46,14 @@ class ChaveUpdateView(SuccessMessageMixin, UpdateView):
     success_message = 'Chave alterada com sucesso!'
 
 
-class ChaveDeleteView(DeleteView):
+class ChaveDeleteView(SuccessMessageMixin, DeleteView):
     model = Chave
     template_name = 'chave_apagar.html'
     success_url = reverse_lazy('chaves')
+    
+    def get_success_message(self, cleaned_data):
+        chave = self.object
+        return f'Chave "{chave.nome}" foi deletada com sucesso!'
 
 
 class CopiasChaveView(ListView):
@@ -89,7 +93,11 @@ class CopiaChaveUpdateView(SuccessMessageMixin, UpdateView):
     success_message = 'Cópia alterada com sucesso!'
 
 
-class CopiaChaveDeleteView(DeleteView):
+class CopiaChaveDeleteView(SuccessMessageMixin, DeleteView):
     model = CopiaChave
     template_name = 'copia_apagar.html'
     success_url = reverse_lazy('copias')
+    
+    def get_success_message(self, cleaned_data):
+        copia = self.object
+        return f'Cópia "{copia.codigo}" foi deletada com sucesso!'

@@ -1,6 +1,7 @@
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
+from django.http import HttpResponseRedirect
 
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -35,7 +36,19 @@ class EmprestimoUpdateView(SuccessMessageMixin, UpdateView):
     success_message = 'Empréstimo alterado com sucesso!'
 
 
-class EmprestimoDeleteView(DeleteView):
+class EmprestimoDeleteView(SuccessMessageMixin, DeleteView):
     model = Emprestimo
     template_name = 'emprestimo_apagar.html'
     success_url = reverse_lazy('emprestimos')
+    
+    def get_success_message(self, cleaned_data):
+        emprestimo = self.object
+        return f'Empréstimo "{emprestimo.id}" foi deletado com sucesso!'
+
+
+class EmprestimoToggleStatusView(View):
+    def get(self, request, pk):
+        emprestimo = Emprestimo.objects.get(pk=pk)
+        emprestimo.toggle_status()
+        messages.success(request, f'Empréstimo alterado para: {emprestimo.get_status()}')
+        return HttpResponseRedirect(reverse_lazy('emprestimos'))

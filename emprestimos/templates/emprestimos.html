@@ -32,7 +32,7 @@
                                     <td>{{ emprestimo.id }}</td>
                                     <td>{{ emprestimo.data_retirada|date:"d/m/Y" }}</td>
                                     <td>{{ emprestimo.data_prevista|date:"d/m/Y" }}</td>
-                                    <td>{% if emprestimo.data_devolucao %}{{ emprestimo.data_devolucao|date:"d/m/Y" }}{% else %}Pendente{% endif %}</td>
+                                    <td><a href="{% url 'emprestimo_toggle_status' emprestimo.pk %}" style="text-decoration: none; cursor: pointer;">{{ emprestimo.get_status }}</a></td>
                                     <td>{% if emprestimo.esta_atrasado %}R$ {{ emprestimo.calcular_multa }}{% else %}-{% endif %}</td>
 
                                     <td>
@@ -63,6 +63,7 @@
                                             <div class="modal-body text-center">
                                                 <p><strong>Data Retirada:</strong> {{ emprestimo.data_retirada|date:"d/m/Y" }}</p>
                                                 <p><strong>Data Prevista:</strong> {{ emprestimo.data_prevista|date:"d/m/Y" }}</p>
+                                                <p><strong>Status:</strong> {{ emprestimo.get_status }}</p>
                                                 <p><strong>Data Devolução:</strong> {% if emprestimo.data_devolucao %}{{ emprestimo.data_devolucao|date:"d/m/Y" }}{% else %}Pendente{% endif %}</p>
                                                 {% if emprestimo.esta_atrasado %}
                                                     <p><strong>Dias em Atraso:</strong> {{ emprestimo.dias_atraso }}</p>
