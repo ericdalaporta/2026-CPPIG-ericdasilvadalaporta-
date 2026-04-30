@@ -50,10 +50,7 @@ class ChaveDeleteView(SuccessMessageMixin, DeleteView):
     model = Chave
     template_name = 'chave_apagar.html'
     success_url = reverse_lazy('chaves')
-    
-    def get_success_message(self, cleaned_data):
-        chave = self.object
-        return f'Chave "{chave.nome}" foi deletada com sucesso!'
+    success_message = 'Chave apagada com sucesso!'
 
 
 class CopiasChaveView(ListView):
@@ -101,3 +98,4 @@ class CopiaChaveDeleteView(SuccessMessageMixin, DeleteView):
     def get_success_message(self, cleaned_data):
         copia = self.object
         return f'Cópia "{copia.codigo}" foi deletada com sucesso!'
+
