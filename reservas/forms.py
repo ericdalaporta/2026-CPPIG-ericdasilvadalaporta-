@@ -6,12 +6,7 @@ from .models import Reserva
 class ReservaModelForm(forms.ModelForm):
     class Meta:
         model = Reserva
-        fields = '__all__'
-        widgets = {
-            'data_inicio': DateInput(attrs={'type': 'date', 'class': 'form-control', 'required': False}),
-            'data_fim': DateInput(attrs={'type': 'date', 'class': 'form-control', 'required': False}),
-            'status': forms.TextInput(attrs={'class': 'form-control', 'required': False}),
-        }
+        fields = ['cliente', 'propriedade', 'data_inicio', 'data_fim', 'status']
 
         error_messages = {
             'data_inicio': {'required': 'A Data de Início é um campo obrigatório'},

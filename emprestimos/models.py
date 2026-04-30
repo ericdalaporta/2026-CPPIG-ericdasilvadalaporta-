@@ -3,6 +3,9 @@ from datetime import date
 
 
 class Emprestimo(models.Model):
+    cliente = models.ForeignKey('clientes.Cliente', verbose_name='Cliente', help_text='Nome do cliente', on_delete=models.PROTECT, related_name='emprestimos', null=True, blank=True)
+    propriedade = models.ForeignKey('propriedades.Propriedade', verbose_name='Propriedade', help_text='Propriedade do empréstimo', on_delete=models.PROTECT, related_name='emprestimos', null=True, blank=True)
+    copia = models.ForeignKey('chaves.CopiaChave', verbose_name='Cópia', help_text='Cópia de chave relacionada', on_delete=models.PROTECT, related_name='emprestimos', null=True, blank=True)
     data_retirada = models.DateField('Data de Retirada', blank=False, help_text='Data da retirada do empréstimo')
     data_prevista = models.DateField('Data Prevista', blank=False, help_text='Data prevista de devolução')
     data_devolucao = models.DateField('Data de Devolução', null=True, blank=True, help_text='Data da devolução do empréstimo')

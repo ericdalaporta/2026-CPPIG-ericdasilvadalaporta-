@@ -3,7 +3,6 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
 from django.http import HttpResponseRedirect
 
-from django.core.paginator import Paginator
 from django.contrib import messages
 
 from .models import Emprestimo

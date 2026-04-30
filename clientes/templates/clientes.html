@@ -74,18 +74,57 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
-                                            <div class="modal-body text-center">
+                                            <div class="modal-body text-start">
 
                                                 {% if cliente.foto.url is not empty %}
-                                                    <img src="{{ cliente.foto.url }}"
-                                                         class="img-thumbnail mb-3"
-                                                         width="150" height="150">
-                                                {% else %}
-                                                    <p>Sem foto</p>
+                                                    <div class="text-center mb-3">
+                                                        <img src="{{ cliente.foto.url }}"
+                                                             class="img-thumbnail"
+                                                             width="150" height="150">
+                                                    </div>
                                                 {% endif %}
 
                                                 <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
                                                 <p><strong>Email:</strong> {{ cliente.email }}</p>
+
+                                                <hr>
+                                                <h6 class="fw-bold">Cópias de Chaves do Cliente:</h6>
+                                                {% if cliente.emprestimos.exists %}
+                                                    <ul class="small">
+                                                        {% for emp in cliente.emprestimos.all %}
+                                                            {% if emp.copia %}
+                                                                <li>{{ emp.copia.chave.nome }} (Código: {{ emp.copia.codigo }}) - {{ emp.get_status }}</li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p class="text-muted small">Nenhuma cópia de chave</p>
+                                                {% endif %}
+
+                                                <hr>
+                                                <h6 class="fw-bold">Reservas do Cliente:</h6>
+                                                {% if cliente.reservas.exists %}
+                                                    <ul class="small">
+                                                        {% for reserva in cliente.reservas.all %}
+                                                            <li>{{ reserva.propriedade.nome }} - {{ reserva.data_inicio|date:"d/m/Y" }} até {{ reserva.data_fim|date:"d/m/Y" }} ({{ reserva.status }})</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p class="text-muted small">Nenhuma reserva</p>
+                                                {% endif %}
+
+                                                <hr>
+                                                <h6 class="fw-bold">Empréstimos do Cliente:</h6>
+                                                {% if cliente.emprestimos.exists %}
+                                                    <ul class="small">
+                                                        {% for emp in cliente.emprestimos.all %}
+                                                            <li>{{ emp.propriedade.nome }} - Retirada: {{ emp.data_retirada|date:"d/m/Y" }} 
+                                                            {% if emp.esta_atrasado %}<span class="badge bg-danger">Atrasado {{ emp.dias_atraso }}d - Multa: R$ {{ emp.calcular_multa }}</span>{% else %}<span class="badge bg-success">{{ emp.get_status }}</span>{% endif %}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p class="text-muted small">Nenhum empréstimo</p>
+                                                {% endif %}
 
                                             </div>
 

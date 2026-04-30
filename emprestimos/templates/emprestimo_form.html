@@ -5,34 +5,11 @@
 <div class="card shadow m-3 col-md-6 mx-auto">
     <div class="card-body">
         <div class="row">
-            <h3 class="text-center">Cadastro de Empréstimo</h3>
+            <h3 class="text-center mb-4">Cadastro de Empréstimo</h3>
             <form method="POST" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
+                {% bootstrap_form form %}
                 
-                <div class="mb-3">
-                    <label for="{{ form.data_retirada.id_for_label }}" class="form-label fw-bold">{{ form.data_retirada.label }}</label>
-                    {{ form.data_retirada }}
-                    {% if form.data_retirada.errors %}
-                        <div class="alert alert-danger mt-2 mb-0" role="alert">
-                            {% for error in form.data_retirada.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.data_prevista.id_for_label }}" class="form-label fw-bold">{{ form.data_prevista.label }}</label>
-                    {{ form.data_prevista }}
-                    {% if form.data_prevista.errors %}
-                        <div class="alert alert-danger mt-2 mb-0" role="alert">
-                            {% for error in form.data_prevista.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
                 <div class="text-end mt-3">
                     <button class="btn btn-primary" type="submit">Salvar</button>
                     <a href="{% url 'emprestimos' %}" class="btn btn-secondary text-white" type="button">
