@@ -1,0 +1,33 @@
+{% extends 'principal.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<div class="card shadow m-3 col-md-6 mx-auto">
+    <div class="card-body">
+        <div class="row">
+            <h3 class="text-center">Dados da Reserva</h3>
+
+            <p class="p-2 mt-2"><strong>Data Início:</strong> {{ object.data_inicio|date:"d/m/Y" }}</p>
+            <p class="p-2 mt-2"><strong>Data Fim:</strong> {{ object.data_fim|date:"d/m/Y" }}</p>
+            <p class="p-2 mt-2"><strong>Status:</strong> {{ object.status }}</p>
+
+            <p class="p-2 mt-2">
+                Confirma a exclusão da reserva: <strong>{{ object }}</strong>?
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="text-end">
+                    {% bootstrap_button button_type="submit" content="Sim" %}
+                    
+                    <a href="{% url 'reservas' %}" class="btn btn-secondary text-white" type="button">
+                        <span class="text">Cancelar</span>
+                    </a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
