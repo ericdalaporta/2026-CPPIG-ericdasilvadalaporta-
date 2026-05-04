@@ -4,6 +4,7 @@ Este repositório contém o desenvolvimento de um sistema de gerenciamento para 
 
 ## Diagrama UML
 
-![Diagrama de Classes/UML](./diagrama.png)
+![Diagrama de Classes/UML](./diagrama-uml.png)
+
 
 EM BREVE...
