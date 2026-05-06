@@ -7,6 +7,24 @@
 <section class="section">
     <div class="container">
 
+        <form method="GET">
+            <div class="row p-3 align-items-center">
+                <label class="col-md-2 col-form-label fw-bold">Buscar:</label>
+
+                <div class="col-md-8">
+                    <input class="form-control" type="text" name="buscar"
+                           value="{{ request.GET.buscar }}"
+                           placeholder="Digite o ID, cliente ou propriedade">
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </form>
+
         <div class="card shadow-sm mt-3">
             <div class="card-body">
 
@@ -17,7 +35,6 @@
 
                         <thead class="table-primary">
                             <tr>
-                                <th>ID</th>
                                 <th>Data Início</th>
                                 <th>Data Fim</th>
                                 <th>Status</th>
@@ -28,27 +45,26 @@
                         <tbody>
                             {% for reserva in object_list %}
                                 <tr>
-                                    <td>{{ reserva.id }}</td>
                                     <td>{{ reserva.data_inicio|date:"d/m/Y" }}</td>
                                     <td>{{ reserva.data_fim|date:"d/m/Y" }}</td>
                                     <td>{{ reserva.status }}</td>
 
                                     <td>
-                                        <a href="{% url 'reserva_editar' reserva.pk %}" class="text-primary me-2">
+                                        <a href="{% url 'reserva_editar' reserva.pk %}" class="text-primary me-2" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <a href="{% url 'reserva_apagar' reserva.pk %}" class="text-danger me-2">
+                                        <a href="{% url 'reserva_apagar' reserva.pk %}" class="text-danger me-2" title="Deletar">
                                             <i class="fas fa-trash"></i>
                                         </a>
 
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ reserva.id }}" class="text-secondary">
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ reserva.id }}" class="text-secondary" title="Ver detalhes">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
 
-                                <!-- MODAL -->
+                                <!-- modal -->
                                 <div class="modal fade" id="modal{{ reserva.id }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -75,7 +91,7 @@
                                 </div>
                             {% empty %}
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Nenhuma reserva cadastrada</td>
+                                    <td colspan="4" class="text-center text-muted">Nenhuma reserva cadastrada</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -83,7 +99,7 @@
                 </div>
             </div>
 
-            <!-- PAGINAÇÃO -->
+            <!-- paginacao -->
             <div class="d-flex justify-content-center mt-3">
                 {% bootstrap_pagination page_obj %}
             </div>

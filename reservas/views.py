@@ -1,6 +1,8 @@
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.db.models import Q
+from django.contrib import messages
 
 from .models import Reserva
 from .forms import ReservaModelForm
@@ -13,8 +15,24 @@ class ReservasView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
+        buscar = self.request.GET.get('buscar')
         qs = Reserva.objects.all()
+
+        if buscar:
+            qs = qs.filter(
+                Q(cliente__nome__icontains=buscar) |
+                Q(propriedade__nome__icontains=buscar) |
+                Q(id__icontains=buscar)
+            )
+
         return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if not context['object_list'] and self.request.GET.get('buscar'):
+            messages.info(self.request, 'Não existem reservas cadastradas com esse critério!')
+        return context
+
 
 class ReservaAddView(SuccessMessageMixin, CreateView):
     model = Reserva
@@ -23,6 +41,12 @@ class ReservaAddView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('reservas')
     success_message = 'Reserva adicionada com sucesso!'
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        copias_selecionadas = self.request.POST.getlist('copias')
+        self.object.copias.set(copias_selecionadas)
+        return response
+
 
 class ReservaUpdateView(SuccessMessageMixin, UpdateView):
     model = Reserva
@@ -30,6 +54,12 @@ class ReservaUpdateView(SuccessMessageMixin, UpdateView):
     template_name = 'reserva_form.html'
     success_url = reverse_lazy('reservas')
     success_message = 'Reserva alterada com sucesso!'
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        copias_selecionadas = self.request.POST.getlist('copias')
+        self.object.copias.set(copias_selecionadas)
+        return response
 
 
 class ReservaDeleteView(SuccessMessageMixin, DeleteView):

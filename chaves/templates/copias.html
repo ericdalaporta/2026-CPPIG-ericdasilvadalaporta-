@@ -36,6 +36,8 @@
                         <thead class="table-primary">
                             <tr>
                                 <th>Código</th>
+                                <th>Chave</th>
+                                <th>Propriedade</th>
                                 <th>Status</th>
                                 <th>Valor Restituição</th>
                                 <th style="width: 150px;">Ações</th>
@@ -46,15 +48,23 @@
                             {% for copia in object_list %}
                                 <tr>
                                     <td>{{ copia.codigo }}</td>
-                                    <td>{{ copia.status }}</td>
+                                    <td>{{ copia.chave.nome }}</td>
+                                    <td>
+                                        {% if copia.chave.propriedade %}
+                                            {{ copia.chave.propriedade.nome }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ copia.get_status_display }}</td>
                                     <td>R$ {{ copia.valor_restituicao }}</td>
 
                                     <td>
-                                        <a href="{% url 'copia_editar' copia.pk %}" class="text-primary me-2">
+                                        <a href="{% url 'copia_editar' copia.pk %}" class="text-primary me-2" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <a href="{% url 'copia_apagar' copia.pk %}" class="text-danger me-2">
+                                        <a href="{% url 'copia_apagar' copia.pk %}" class="text-danger me-2" title="Deletar">
                                             <i class="fas fa-trash"></i>
                                         </a>
 
@@ -64,8 +74,8 @@
                                     </td>
                                 </tr>
 
-                                <!-- MODAL -->
-                                <div class="modal fade" id="modal{{ copia.id }}" tabindex="-1">
+                                <!-- modal -->
+                                <div class="modal" id="modal{{ copia.id }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
 
@@ -93,7 +103,7 @@
                                 </div>
                             {% empty %}
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted">Nenhuma cópia cadastrada</td>
+                                    <td colspan="6" class="text-center text-muted">Nenhuma cópia cadastrada</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -101,7 +111,7 @@
                 </div>
             </div>
 
-            <!-- PAGINAÇÃO -->
+            <!-- paginacao -->
             <div class="d-flex justify-content-center mt-3">
                 {% bootstrap_pagination page_obj %}
             </div>

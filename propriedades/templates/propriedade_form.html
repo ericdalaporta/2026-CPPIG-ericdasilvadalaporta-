@@ -8,16 +8,62 @@
             <h3 class="text-center mb-4">Cadastro de Propriedade</h3>
             <form method="POST" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
-                {% bootstrap_form form %}
+                
+                {% bootstrap_field form.nome %}
+                
+                {% bootstrap_field form.tipo %}
+                
+                <!-- portão associado (Condicional para Chalé Exclusivo) -->
+                <div id="portao-field" style="display: none;">
+                    {% bootstrap_field form.portao_associado %}
+                </div>
+                
+                <!-- propriedade linkada (Condicional para Portão) -->
+                <div id="propriedade-linkada-field" style="display: none;">
+                    {% bootstrap_field form.propriedade_linkada %}
+                </div>
                 
                 <div class="text-end mt-3">
                     <button class="btn btn-primary" type="submit">Salvar</button>
-                    <a href="{% url 'propriedades' %}" class="btn btn-secondary text-white" type="button">
-                        <span class="text">Cancelar</span>
+                    <a href="{% url 'propriedades' %}" class="btn btn-secondary" type="button">
+                        Cancelar
                     </a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script> // script para mostrar/ocultar campos condicionalmente - revisar essa logica 
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('id_tipo');
+    const portaoField = document.getElementById('portao-field');
+    const propriedadeLinhadaField = document.getElementById('propriedade-linkada-field');
+    
+    function verificarTipo() {
+        const tipo = tipoSelect.value;
+        
+        // mostrar portao-field apenas para CHALE_EXCLUSIVO
+        if (tipo === 'CHALE_EXCLUSIVO') {
+            portaoField.style.display = 'block';
+        } else {
+            portaoField.style.display = 'none';
+        }
+        
+        // mostrar propriedade-linkada-field apenas para PORTAO
+        if (tipo === 'PORTAO') {
+            propriedadeLinhadaField.style.display = 'block';
+        } else {
+            propriedadeLinhadaField.style.display = 'none';
+        }
+    }
+    
+    // executar ao carregar
+    verificarTipo();
+    
+    // executar ao mudar
+    tipoSelect.addEventListener('change', verificarTipo);
+});
+</script>
 {% endblock %}

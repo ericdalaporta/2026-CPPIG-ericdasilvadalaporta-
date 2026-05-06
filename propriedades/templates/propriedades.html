@@ -28,7 +28,11 @@
         <div class="card shadow-sm mt-3">
             <div class="card-body">
 
-                <h3 class="text-center mb-4">Propriedades Cadastradas</h3>
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h3>Propriedades Cadastradas</h3>
+                    </div>
+                </div>
 
                 <div class="table-responsive">
                     <table class="table table-hover align-middle text-center">
@@ -36,8 +40,8 @@
                         <thead class="table-primary">
                             <tr>
                                 <th class="text-start">Nome</th>
-                                <th>Número</th>
-                                <th>Status</th>
+                                <th>Tipo</th>
+                                <th>Portão Associado</th>
                                 <th style="width: 150px;">Ações</th>
                             </tr>
                         </thead>
@@ -46,25 +50,31 @@
                             {% for propriedade in object_list %}
                                 <tr>
                                     <td class="text-start">{{ propriedade.nome }}</td>
-                                    <td>{{ propriedade.get_tipo_display }}</td>
-                                    <td><a href="{% url 'propriedade_toggle_status' propriedade.pk %}" style="text-decoration: none; cursor: pointer;">{{ propriedade.get_status }}</a></td>
+                                    <td>{{ propriedade.get_tipo_display_custom }}</td>
+                                    <td>
+                                        {% if propriedade.portao_associado %}
+                                            {{ propriedade.portao_associado.nome }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
 
                                     <td>
-                                        <a href="{% url 'propriedade_editar' propriedade.pk %}" class="text-primary me-2">
+                                        <a href="{% url 'propriedade_editar' propriedade.pk %}" class="text-primary me-2" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <a href="{% url 'propriedade_apagar' propriedade.pk %}" class="text-danger me-2">
+                                        <a href="{% url 'propriedade_apagar' propriedade.pk %}" class="text-danger me-2" title="Deletar">
                                             <i class="fas fa-trash"></i>
                                         </a>
 
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ propriedade.id }}" class="text-secondary">
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ propriedade.id }}" class="text-secondary" title="Ver detalhes">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
 
-                                <!-- MODAL -->
+                                <!-- modal -->
                                 <div class="modal fade" id="modal{{ propriedade.id }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -76,8 +86,10 @@
 
                                             <div class="modal-body text-center">
                                                 <p><strong>Nome:</strong> {{ propriedade.nome }}</p>
-                                                <p><strong>Tipo:</strong> {{ propriedade.get_tipo_display }}</p>
-                                                <p><strong>Status:</strong> {{ propriedade.get_status }}</p>
+                                                <p><strong>Tipo:</strong> {{ propriedade.get_tipo_display_custom }}</p>
+                                                {% if propriedade.portao_associado %}
+                                                    <p><strong>Portão Associado:</strong> {{ propriedade.portao_associado.nome }}</p>
+                                                {% endif %}
                                             </div>
 
                                             <div class="modal-footer">
@@ -91,7 +103,7 @@
                                 </div>
                             {% empty %}
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">Nenhuma propriedade cadastrada</td>
+                                    <td colspan="4" class="text-center text-muted">Nenhuma propriedade cadastrada</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -99,7 +111,7 @@
                 </div>
             </div>
 
-            <!-- PAGINAÇÃO -->
+            <!-- paginacao -->
             <div class="d-flex justify-content-center mt-3">
                 {% bootstrap_pagination page_obj %}
             </div>

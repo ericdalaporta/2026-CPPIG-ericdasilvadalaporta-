@@ -36,6 +36,7 @@
                         <thead class="table-primary">
                             <tr>
                                 <th class="text-start">Nome</th>
+                                <th>Propriedade</th>
                                 <th style="width: 150px;">Ações</th>
                             </tr>
                         </thead>
@@ -44,24 +45,31 @@
                             {% for chave in object_list %}
                                 <tr>
                                     <td class="text-start">{{ chave.nome }}</td>
+                                    <td>
+                                        {% if chave.propriedade %}
+                                            {{ chave.propriedade.nome }}
+                                        {% else %}             <!-- evita erro se propriedade for nula -->
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
 
                                     <td>
-                                        <a href="{% url 'chave_editar' chave.pk %}" class="text-primary me-2">
+                                        <a href="{% url 'chave_editar' chave.pk %}" class="text-primary me-2" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <a href="{% url 'chave_apagar' chave.pk %}" class="text-danger me-2">
+                                        <a href="{% url 'chave_apagar' chave.pk %}" class="text-danger me-2" title="Deletar">
                                             <i class="fas fa-trash"></i>
                                         </a>
 
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ chave.id }}" class="text-secondary">
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ chave.id }}" class="text-secondary" title="Ver detalhes">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
 
-                                <!-- MODAL -->
-                                <div class="modal fade" id="modal{{ chave.id }}" tabindex="-1">
+                                <!-- modal do olhinho -->
+                                <div class="modal" id="modal{{ chave.id }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
 
@@ -83,8 +91,9 @@
                                         </div>
                                     </div>
                                 </div>
-                            {% empty %}
-                                <tr>
+                            {% empty %}             <!-- caso não tenha nada mostra msg -->
+
+                                <tr> 
                                     <td colspan="2" class="text-center text-muted">Nenhuma chave cadastrada</td>
                                 </tr>
                             {% endfor %}
@@ -93,7 +102,7 @@
                 </div>
             </div>
 
-            <!-- PAGINAÇÃO -->
+            <!-- paginacao -->
             <div class="d-flex justify-content-center mt-3">
                 {% bootstrap_pagination page_obj %}
             </div>

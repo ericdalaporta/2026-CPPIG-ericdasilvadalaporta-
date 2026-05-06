@@ -4,7 +4,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, V
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 
-from .models import Propriedade
+from .models import Propriedade, chale_comum, chale_exclusivo, Portao
 from .forms import PropriedadeModelForm
 
 
@@ -29,12 +29,30 @@ class PropriedadesView(ListView):
             messages.info(self.request, 'Não existem propriedades cadastradas com esse nome!')
         return context
 
+
 class PropriedadeAddView(SuccessMessageMixin, CreateView):
     model = Propriedade
     form_class = PropriedadeModelForm
     template_name = 'propriedade_form.html'
     success_url = reverse_lazy('propriedades')
     success_message = 'Propriedade adicionada com sucesso!'
+    
+    def form_valid(self, form):
+        tipo = form.cleaned_data['tipo']
+        nome = form.cleaned_data['nome']
+        portao_associado = form.cleaned_data.get('portao_associado')
+        
+        if tipo == 'CHALE_COMUM':
+            self.object = chale_comum(nome=nome, tipo=tipo, portao_associado=portao_associado)
+        elif tipo == 'CHALE_EXCLUSIVO':
+            self.object = chale_exclusivo(nome=nome, tipo=tipo, portao_associado=portao_associado)
+        elif tipo == 'PORTAO':
+            self.object = Portao(nome=nome, tipo=tipo, portao_associado=portao_associado)
+        else:
+            self.object = Propriedade(nome=nome, tipo=tipo, portao_associado=portao_associado)
+        
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class PropriedadeUpdateView(SuccessMessageMixin, UpdateView):
@@ -50,10 +68,3 @@ class PropriedadeDeleteView(SuccessMessageMixin, DeleteView):
     template_name = 'propriedade_apagar.html'
     success_url = reverse_lazy('propriedades')
     success_message = 'Propriedade apagada com sucesso!'
-
-class PropriedadeToggleStatusView(View):
-    def get(self, request, pk):
-        propriedade = Propriedade.objects.get(pk=pk)
-        propriedade.toggle_status()
-        messages.success(request, f'Propriedade alterada para: {propriedade.get_status()}')
-        return HttpResponseRedirect(reverse_lazy('propriedades'))

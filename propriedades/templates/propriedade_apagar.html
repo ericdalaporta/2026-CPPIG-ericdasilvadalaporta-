@@ -8,7 +8,10 @@
             <h3 class="text-center">Dados da Propriedade</h3>
 
             <p class="p-2 mt-2"><strong>Nome:</strong> {{ object.nome }}</p>
-            <p class="p-2 mt-2"><strong>Classificação:</strong> {{ object.classificacao|yesno:"Sim,Não" }}</p>
+            <p class="p-2 mt-2"><strong>Tipo:</strong> {{ object.get_tipo_display_custom }}</p>
+            {% if object.portao_associado %}
+                <p class="p-2 mt-2"><strong>Portão Associado:</strong> {{ object.portao_associado.nome }}</p>
+            {% endif %}
 
             <p class="p-2 mt-2">
                 Confirma a exclusão da propriedade: <strong>{{ object }}</strong>?
