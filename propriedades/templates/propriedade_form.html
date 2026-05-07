@@ -17,7 +17,7 @@
                 <div id="portao-field" style="display: none;">
                     {% bootstrap_field form.portao_associado %}
                 </div>
-                
+
                 <!-- propriedade linkada (Condicional para Portão) -->
                 <div id="propriedade-linkada-field" style="display: none;">
                     {% bootstrap_field form.propriedade_linkada %}
@@ -41,28 +41,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const portaoField = document.getElementById('portao-field');
     const propriedadeLinhadaField = document.getElementById('propriedade-linkada-field');
     
-    function verificarTipo() {
+    function verificarTipo() { //pra mostrar os campos especificos de chale exclusivo e portao
         const tipo = tipoSelect.value;
         
-        // mostrar portao-field apenas para CHALE_EXCLUSIVO
+        // mostrar portao field apenas para chale exclusivo
         if (tipo === 'CHALE_EXCLUSIVO') {
             portaoField.style.display = 'block';
         } else {
             portaoField.style.display = 'none';
         }
-        
-        // mostrar propriedade-linkada-field apenas para PORTAO
+
+        // mostrar propriedade linkada field apenas para portão
         if (tipo === 'PORTAO') {
             propriedadeLinhadaField.style.display = 'block';
         } else {
             propriedadeLinhadaField.style.display = 'none';
         }
     }
-    
-    // executar ao carregar
+
+    // executar ao carregar (caso de atualizar a pag e tal)
     verificarTipo();
-    
-    // executar ao mudar
+
+    // executar ao mudar (clicar no tipo)
     tipoSelect.addEventListener('change', verificarTipo);
 });
 </script>

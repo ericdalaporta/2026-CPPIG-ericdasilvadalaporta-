@@ -56,7 +56,7 @@ class Portao(Propriedade):
         null=True,
         blank=True,
         related_name='portoes_linkados',
-        limit_choices_to=~Q(tipo='PORTAO')
+        limit_choices_to=~Q(tipo='PORTAO') #o campo só mostra opcoes do tipo nao portao
     )
     
     class Meta:

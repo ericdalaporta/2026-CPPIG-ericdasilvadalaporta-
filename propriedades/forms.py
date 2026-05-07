@@ -7,7 +7,7 @@ class PropriedadeModelForm(forms.ModelForm):
         queryset=Propriedade.objects.filter(~Q(tipo='PORTAO')),
         required=False,
         label='Propriedade Linkada',
-        empty_label='-- Nenhuma --'
+        empty_label='Nenhuma'
     )
     
     class Meta:

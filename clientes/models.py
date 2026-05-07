@@ -5,8 +5,8 @@ from stdimage import StdImageField
 class Cliente(models.Model):
 
     nome = models.CharField(
-        'Nome', 
-        max_length=70, 
+        'Nome',
+        max_length=70,
         help_text='Nome do cliente'
     )
     
@@ -18,7 +18,7 @@ class Cliente(models.Model):
 
     email = models.EmailField(
         'E-mail', 
-        max_length=50, 
+        max_length=100,
         help_text='E-mail do cliente', 
         unique=True  # evitar duplicacao de email
     )

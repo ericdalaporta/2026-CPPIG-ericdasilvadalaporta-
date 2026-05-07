@@ -17,7 +17,7 @@ class ClientesView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        """Busca clientes, filtrando se user digitou nome"""
+        """busca clientes, filtrando se user digitou nome"""
         buscar = self.request.GET.get('buscar')
         qs = Cliente.objects.all()
 
@@ -54,7 +54,6 @@ class ClienteUpdateView(SuccessMessageMixin, UpdateView):
 
 class ClienteDeleteView(SuccessMessageMixin, DeleteView):
 
-    
     model = Cliente
     template_name = 'cliente_apagar.html'
     success_url = reverse_lazy('clientes')

@@ -11,6 +11,7 @@ class Chave(models.Model):
     )
 
     propriedade = models.ForeignKey( #muitas chaves podem pertencer a uma propriedade
+    #nao ta dando pra linkar mais de uma propriedade à mesma chave no select de cadastrar chave
         'propriedades.Propriedade',
         verbose_name='Propriedade', 
         help_text='Propriedade relacionada', 
@@ -43,6 +44,7 @@ class CopiaChave(models.Model):
     )
     
     chave = models.ForeignKey( #foreign key eh 1 pra n, aqui liga cópia com chave
+        #no front nao ta dando pra linkar uma copia a mais de uma chave (modelo) porraaaaa
         Chave,
         verbose_name='Chave', 
         help_text='Chave relacionada', 
