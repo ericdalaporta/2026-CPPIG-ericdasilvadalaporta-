@@ -10,8 +10,8 @@ class Chave(models.Model):
         help_text='Nome do modelo da chave'
     )
 
-    propriedade = models.ForeignKey( #muitas chaves podem pertencer a uma propriedade
-    #nao ta dando pra linkar mais de uma propriedade à mesma chave no select de cadastrar chave
+    propriedade = models.ForeignKey( #da pra cadastrar 1 chave pra mais de 1 prop no
+        #front mas não no mesmo form!!!!
         'propriedades.Propriedade',
         verbose_name='Propriedade', 
         help_text='Propriedade relacionada', 
@@ -43,8 +43,7 @@ class CopiaChave(models.Model):
         help_text='Código da cópia da chave'
     )
     
-    chave = models.ForeignKey( #foreign key eh 1 pra n, aqui liga cópia com chave
-        #no front nao ta dando pra linkar uma copia a mais de uma chave (modelo) porraaaaa
+    chave = models.ForeignKey( #mesma coisa que aquele caso da chave com propriedade
         Chave,
         verbose_name='Chave', 
         help_text='Chave relacionada', 
