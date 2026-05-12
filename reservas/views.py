@@ -67,3 +67,10 @@ class ReservaDeleteView(SuccessMessageMixin, DeleteView):
     template_name = 'reserva_apagar.html'
     success_url = reverse_lazy('reservas')
     success_message = 'Reserva apagada com sucesso!'
+
+#adicionar isso num futuro ReservaExibir
+
+    def enviar_email(self, reserva):
+        email = []
+        email.append(reserva.cliente.email)
+        # preciso refazer essa parte toda, não tenho nada do que tem no lavacar
