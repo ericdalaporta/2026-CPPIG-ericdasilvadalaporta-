@@ -2,7 +2,8 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<div class="card shadow m-3 col-md-6 mx-auto">
+<div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 200px);">
+<div class="card shadow-lg m-3 col-md-6">
     <div class="card-body">
         <div class="row">
             <h3 class="text-center mb-4">Cadastro de Propriedade</h3>
@@ -11,17 +12,14 @@
                 
                 {% bootstrap_field form.nome %}
                 
-                {% bootstrap_field form.tipo %}
+                {% bootstrap_field form.tipo %}  <!--id_tipo foi criado automaticamente pelo django -->
                 
                 <!-- portão associado (Condicional para Chalé Exclusivo) -->
                 <div id="portao-field" style="display: none;">
                     {% bootstrap_field form.portao_associado %}
                 </div>
 
-                <!-- propriedade linkada (Condicional para Portão) -->
-                <div id="propriedade-linkada-field" style="display: none;">
-                    {% bootstrap_field form.propriedade_linkada %}
-                </div>
+
                 
                 <div class="text-end mt-3">
                     <button class="btn btn-primary" type="submit">Salvar</button>
@@ -33,37 +31,26 @@
         </div>
     </div>
 </div>
+</div>
 
-<script> // script para mostrar/ocultar campos condicionalmente - revisar essa logica 
+<script>
 
 document.addEventListener('DOMContentLoaded', function() {
-    const tipoSelect = document.getElementById('id_tipo');
+
+    const tipoSelect = document.getElementById('id_tipo'); // cria var TipoSelect e guarda o elemento html nela
     const portaoField = document.getElementById('portao-field');
-    const propriedadeLinhadaField = document.getElementById('propriedade-linkada-field');
-    
-    function verificarTipo() { //pra mostrar os campos especificos de chale exclusivo e portao
-        const tipo = tipoSelect.value;
-        
-        // mostrar portao field apenas para chale exclusivo
-        if (tipo === 'CHALE_EXCLUSIVO') {
+
+    tipoSelect.addEventListener('change', function() { //quando muda o valor do select executa
+
+        if (tipoSelect.value === 'CHALE_EXCLUSIVO') {
             portaoField.style.display = 'block';
         } else {
             portaoField.style.display = 'none';
         }
 
-        // mostrar propriedade linkada field apenas para portão
-        if (tipo === 'PORTAO') {
-            propriedadeLinhadaField.style.display = 'block';
-        } else {
-            propriedadeLinhadaField.style.display = 'none';
-        }
-    }
+    });
 
-    // executar ao carregar (caso de atualizar a pag e tal)
-    verificarTipo();
-
-    // executar ao mudar (clicar no tipo)
-    tipoSelect.addEventListener('change', verificarTipo);
 });
+
 </script>
 {% endblock %}

@@ -1,5 +1,4 @@
 from django import forms
-from django.forms.widgets import DateInput
 from django.core.exceptions import ValidationError
 
 from .models import Emprestimo, ItemEmprestimo
@@ -8,18 +7,28 @@ from chaves.models import CopiaChave
 class EmprestimoModelForm(forms.ModelForm):
     copias = forms.ModelMultipleChoiceField(
         queryset=CopiaChave.objects.filter(status='DISPONIVEL'),
-        widget=forms.SelectMultiple,
         required=False,
         label='Cópias de Chave'
     )
     
     class Meta:
         model = Emprestimo
-        fields = ['cliente', 'data_retirada', 'data_prevista']
+        fields = '__all__'
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['copias'].queryset = CopiaChave.objects.filter(status='DISPONIVEL')
+        
+        # Se está editando (já tem ID), mostrar TODAS as cópias
+        # Se for novo, mostrar só DISPONIVEL
+        if self.instance.pk:
+            # Edição: mostrar todas as cópias
+            self.fields['copias'].queryset = CopiaChave.objects.all()
+            # Pré-selecionar as cópias já vinculadas
+            cópias_vinculadas = self.instance.itens.values_list('copia_chave_id', flat=True)
+            self.fields['copias'].initial = cópias_vinculadas
+        else:
+            # Novo: mostrar só disponível
+            self.fields['copias'].queryset = CopiaChave.objects.filter(status='DISPONIVEL')
     
     def clean(self):
         cleaned_data = super().clean()

@@ -25,7 +25,7 @@
             </div>
         </form>
 
-        <div class="card shadow-sm mt-3">
+        <div class="card shadow mt-3">
             <div class="card-body">
 
                 <h3 class="text-center mb-4">Empréstimos Cadastrados</h3>
@@ -86,47 +86,31 @@
                                         <div class="modal-content">
 
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Empréstimo: {{ emprestimo.id }}</h5>
+                                                <h5 class="modal-title">Empréstimo</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
                                             <div class="modal-body">
                                                 <p><strong>Cliente:</strong> {{ emprestimo.cliente.nome }}</p>
-                                                <p><strong>Data Retirada:</strong> {{ emprestimo.data_retirada|date:"d/m/Y" }}</p>
-                                                <p><strong>Data Prevista:</strong> {{ emprestimo.data_prevista|date:"d/m/Y" }}</p>
-                                                <p><strong>Status:</strong> 
-                                                    {% if emprestimo.esta_atrasado %}
-                                                        <span class="badge bg-danger">Atrasado ({{ emprestimo.dias_atraso }}d)</span>
-                                                    {% else %}
-                                                        <span class="badge bg-success">{{ emprestimo.get_status }}</span>
-                                                    {% endif %}
-                                                </p>
-                                                <p><strong>Data Devolução:</strong> {% if emprestimo.data_devolucao %}{{ emprestimo.data_devolucao|date:"d/m/Y" }}{% else %}Pendente{% endif %}</p>
                                                 
-                                                {% if emprestimo.esta_atrasado %}
-                                                    <div class="alert alert-danger mt-3">
-                                                        <strong>⚠ MULTA POR ATRASO</strong><br>
-                                                        <strong>Dias em atraso:</strong> {{ emprestimo.dias_atraso }} dias<br>
-                                                        <strong>Valor da multa:</strong> R$ {{ emprestimo.calcular_multa|floatformat:2 }}
-                                                    </div>
-                                                {% endif %}
-                                                
-                                                <h6 class="mt-3">Cópias de Chave:</h6>
-                                                <ul>
+                                                <h6 class="mt-3 mb-2">Cópias de Chave:</h6>
+                                                <ul style="margin-bottom: 0;">
                                                 {% for item in emprestimo.itens.all %}
-                                                    <li>
-                                                        {{ item.copia_chave.chave.nome }} (Cópia {{ item.copia_chave.codigo }}) - 
-                                                        <span class="badge bg-{{ item.status|lower }}">{{ item.get_status_display }}</span>
-                                                        {% if item.multa > 0 %}<br/><strong>Multa:</strong> R$ {{ item.multa }}{% endif %}
-                                                    </li>
+                                                    <li>{{ item.copia_chave.chave.nome }}</li>
                                                 {% endfor %}
                                                 </ul>
+
+                                                <div class="mt-3">
+                                                    <label class="form-label"><strong>Data de Devolução</strong></label>
+                                                    <div class="input-group">
+                                                        <input type="date" class="form-control data-devolucao" id="data_dev_{{ emprestimo.id }}" value="{% if emprestimo.data_devolucao %}{{ emprestimo.data_devolucao|date:'Y-m-d' }}{% endif %}">
+                                                        <button class="btn btn-primary" type="button" onclick="salvarDevolucao({{ emprestimo.id }})">Salvar</button>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div class="modal-footer">
-                                                <button class="btn btn-secondary" data-bs-dismiss="modal">
-                                                    Fechar
-                                                </button>
+                                                <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                                             </div>
 
                                         </div>
@@ -150,5 +134,50 @@
 
     </div>
 </section>
+
+<script>
+function salvarDevolucao(emprestimoId) {
+    const dataDevolucao = document.getElementById('data_dev_' + emprestimoId).value;
+    
+    if (!dataDevolucao) {
+        alert('Digite uma data!');
+        return;
+    }
+
+    fetch(`/emprestimos/${emprestimoId}/salvar-devolucao/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken')
+        },
+        body: JSON.stringify({ data_devolucao: dataDevolucao })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Devolução registrada! Multa encerrada.');
+            location.reload();
+        } else {
+            alert('Erro: ' + data.error);
+        }
+    })
+    .catch(error => console.error('Erro:', error));
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 
 {% endblock %}

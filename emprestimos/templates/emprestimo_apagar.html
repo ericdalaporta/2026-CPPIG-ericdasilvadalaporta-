@@ -2,7 +2,8 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<div class="card shadow m-3 col-md-6 mx-auto">
+<div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 200px);">
+<div class="card shadow-lg m-3 col-md-6">
     <div class="card-body">
         <div class="row">
             <h3 class="text-center">Dados do Empréstimo</h3>
@@ -10,7 +11,7 @@
             <p class="p-2 mt-2"><strong>Data Retirada:</strong> {{ object.data_retirada|date:"d/m/Y" }}</p>
             <p class="p-2 mt-2"><strong>Data Prevista:</strong> {{ object.data_prevista|date:"d/m/Y" }}</p>
             <p class="p-2 mt-2"><strong>Data Devolução:</strong> {% if object.data_devolucao %}{{ object.data_devolucao|date:"d/m/Y" }}{% else %}Pendente{% endif %}</p>
-            <p class="p-2 mt-2"><strong>Multa:</strong> R$ {{ object.multa }}</p>
+            <p class="p-2 mt-2"><strong>Multa:</strong> R$ {{ object.calcular_multa }}</p>
 
             <p class="p-2 mt-2">
                 Confirma a exclusão do empréstimo: <strong>{{ object }}</strong>?
@@ -30,5 +31,6 @@
 
         </div>
     </div>
+</div>
 </div>
 {% endblock %}

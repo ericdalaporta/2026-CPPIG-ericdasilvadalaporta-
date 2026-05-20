@@ -12,7 +12,7 @@ from .forms import ChaveModelForm, CopiaChaveModelForm
 class ChavesView(ListView):
     model = Chave
     template_name = 'chaves.html'
-    context_object_name = 'object_list'
+    context_object_name = 'object_list' #pro template conseguir acessar a lista de chaves como object_list
     paginate_by = 10
 
     def get_queryset(self):
@@ -94,8 +94,5 @@ class CopiaChaveDeleteView(SuccessMessageMixin, DeleteView):
     model = CopiaChave
     template_name = 'copia_apagar.html'
     success_url = reverse_lazy('copias')
-    
-    def get_success_message(self, cleaned_data):
-        copia = self.object
-        return f'Cópia "{copia.codigo}" foi deletada com sucesso!'
+    success_message = 'Cópia apagada com sucesso!'
 

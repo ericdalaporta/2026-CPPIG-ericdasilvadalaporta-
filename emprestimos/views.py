@@ -1,10 +1,11 @@
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+import json
 
 from .models import Emprestimo, ItemEmprestimo
 from .forms import EmprestimoModelForm
@@ -46,7 +47,9 @@ class EmprestimoAddView(SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         copias_selecionadas = self.request.POST.getlist('copias')
+        incluir_portao = self.request.POST.get('incluir_portao') == 'on'
 
+        # Salvar cópias selecionadas
         for copia_id in copias_selecionadas:
             copia = CopiaChave.objects.get(id=copia_id)
             ItemEmprestimo.objects.create(
@@ -56,6 +59,29 @@ class EmprestimoAddView(SuccessMessageMixin, CreateView):
             )
             copia.status = 'EMPRESTADA'
             copia.save()
+
+        # Se marcou para incluir portão automaticamente
+        if incluir_portao and copias_selecionadas:
+            copia_id = copias_selecionadas[0]  # Pega a primeira cópia selecionada
+            copia = CopiaChave.objects.get(id=copia_id)
+            
+            # Verifica se é de Chalé Exclusivo e tem portão associado
+            propriedade = copia.chave.propriedade
+            if hasattr(propriedade, 'portao_associado') and propriedade.portao_associado:
+                # Encontra a chave do portão
+                chaves_portao = propriedade.portao_associado.chaves.all()
+                if chaves_portao.exists():
+                    chave_portao = chaves_portao.first()
+                    # Tenta encontrar qualquer cópia da chave do portão
+                    copia_portao = chave_portao.copias.first()
+                    if copia_portao:
+                        ItemEmprestimo.objects.create(
+                            emprestimo=self.object,
+                            copia_chave=copia_portao,
+                            status='EMPRESTADA'
+                        )
+                        copia_portao.status = 'EMPRESTADA'
+                        copia_portao.save()
 
         return response
 
@@ -68,11 +94,18 @@ class EmprestimoUpdateView(SuccessMessageMixin, UpdateView):
     success_message = 'Empréstimo alterado com sucesso!'
 
     def form_valid(self, form):
+        # Primeiro, restaura o status das cópias antigas
+        for item in self.object.itens.all():
+            item.copia_chave.status = 'DISPONIVEL'
+            item.copia_chave.save()
+        
         self.object.itens.all().delete()
 
         response = super().form_valid(form)
         copias_selecionadas = self.request.POST.getlist('copias')
+        incluir_portao = self.request.POST.get('incluir_portao') == 'on'
 
+        # Salvar cópias selecionadas
         for copia_id in copias_selecionadas:
             copia = CopiaChave.objects.get(id=copia_id)
             ItemEmprestimo.objects.create(
@@ -80,6 +113,31 @@ class EmprestimoUpdateView(SuccessMessageMixin, UpdateView):
                 copia_chave=copia,
                 status='EMPRESTADA'
             )
+            copia.status = 'EMPRESTADA'
+            copia.save()
+
+        # Se marcou para incluir portão automaticamente
+        if incluir_portao and copias_selecionadas:
+            copia_id = copias_selecionadas[0]  # Pega a primeira cópia selecionada
+            copia = CopiaChave.objects.get(id=copia_id)
+            
+            # Verifica se é de Chalé Exclusivo e tem portão associado
+            propriedade = copia.chave.propriedade
+            if hasattr(propriedade, 'portao_associado') and propriedade.portao_associado:
+                # Encontra a chave do portão
+                chaves_portao = propriedade.portao_associado.chaves.all()
+                if chaves_portao.exists():
+                    chave_portao = chaves_portao.first()
+                    # Tenta encontrar qualquer cópia da chave do portão
+                    copia_portao = chave_portao.copias.first()
+                    if copia_portao:
+                        ItemEmprestimo.objects.create(
+                            emprestimo=self.object,
+                            copia_chave=copia_portao,
+                            status='EMPRESTADA'
+                        )
+                        copia_portao.status = 'EMPRESTADA'
+                        copia_portao.save()
 
         return response
 
@@ -126,3 +184,26 @@ class EmprestimoToggleStatusView(View):
         emprestimo.save()
         messages.success(request, f'Empréstimo alterado para: {emprestimo.get_status()}')
         return HttpResponseRedirect(reverse_lazy('emprestimos'))
+
+
+class EmprestimoSalvarDevolucaoView(View):
+    def post(self, request, pk):
+        try:
+            data = json.loads(request.body)
+            data_devolucao = data.get('data_devolucao')
+            
+            emprestimo = Emprestimo.objects.get(pk=pk)
+            emprestimo.data_devolucao = data_devolucao
+            emprestimo.save()
+            
+            # Marca todos os itens como DEVOLVIDA
+            for item in emprestimo.itens.all():
+                item.copia_chave.status = 'DISPONIVEL'
+                item.copia_chave.save()
+                item.status = 'DEVOLVIDA'
+                item.data_devolucao_item = data_devolucao
+                item.save()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

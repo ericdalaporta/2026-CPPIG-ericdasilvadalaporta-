@@ -10,8 +10,7 @@ class Chave(models.Model):
         help_text='Nome do modelo da chave'
     )
 
-    propriedade = models.ForeignKey( #da pra cadastrar 1 chave pra mais de 1 prop no
-        #front mas não no mesmo form!!!!
+    propriedade = models.ForeignKey( 
         'propriedades.Propriedade',
         verbose_name='Propriedade', 
         help_text='Propriedade relacionada', 
@@ -37,13 +36,13 @@ class CopiaChave(models.Model):
         ('PERDIDA', 'Perdida'),
     ]
 
-    codigo = models.IntegerField( #pegar numero inteiro
+    codigo = models.IntegerField( # pegar numero inteiro
         'Código', 
         blank=False, 
         help_text='Código da cópia da chave'
     )
     
-    chave = models.ForeignKey( #mesma coisa que aquele caso da chave com propriedade
+    chave = models.ForeignKey( 
         Chave,
         verbose_name='Chave', 
         help_text='Chave relacionada', 
@@ -53,7 +52,7 @@ class CopiaChave(models.Model):
         blank=True
     )
     
-    status = models.CharField( #choice de disponibilidade da cópia
+    status = models.CharField( # armazena a opcao do status_choice no banco de dados
         'Status', 
         max_length=20, 
         choices=STATUS_CHOICES, 
@@ -62,7 +61,7 @@ class CopiaChave(models.Model):
         help_text='Status da cópia da chave'
     )
     
-    valor_restituicao = models.FloatField(
+    valor_restituicao = models.FloatField( #float field eh pra criar campo decimal obviamente
         'Valor Restituição', 
         blank=False, 
         help_text='Valor de restituição da cópia'

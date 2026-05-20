@@ -7,14 +7,17 @@
 <section class="section">
     <div class="container">
 
+        <!-- busca -->
         <form method="GET">
             <div class="row p-3 align-items-center">
-                <label class="col-md-2 col-form-label fw-bold">Nome:</label>
+
+                <label class="col-md-2 col-form-label fw-bold">
+                    Nome:
+                </label>
 
                 <div class="col-md-8">
-                    <input class="form-control" type="text" name="buscar"
-                           value="{{ request.GET.buscar }}"
-                           placeholder="Digite o nome do cliente">
+                    <input class="form-control" type="text" name="buscar" value="{{ request.GET.buscar }}"
+                        placeholder="Digite o nome do cliente">
                 </div>
 
                 <div class="col-md-2">
@@ -22,15 +25,20 @@
                         Buscar
                     </button>
                 </div>
+
             </div>
         </form>
 
-        <div class="card shadow-sm mt-3">
+        <!-- tabela -->
+        <div class="card shadow mt-3">
             <div class="card-body">
 
-                <h3 class="text-center mb-4">Clientes Cadastrados</h3>
+                <h3 class="text-center mb-4">
+                    Clientes Cadastrados
+                </h3>
 
                 <div class="table-responsive">
+
                     <table class="table table-hover align-middle text-center">
 
                         <thead class="table-primary">
@@ -43,109 +51,106 @@
                         </thead>
 
                         <tbody>
+
                             {% for cliente in object_list %}
-                                <tr>
-                                    <td class="text-start">{{ cliente.nome }}</td>
-                                    <td>{{ cliente.telefone }}</td>
-                                    <td>{{ cliente.email }}</td>
 
-                                    <td>
-                                        <a href="{% url 'cliente_editar' cliente.pk %}" class="text-primary me-2">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
+                            <tr>
 
-                                        <a href="{% url 'cliente_apagar' cliente.pk %}" class="text-danger me-2">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
+                                <td class="text-start">
+                                    {{ cliente.nome }}
+                                </td>
 
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ cliente.id }}" class="text-secondary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
+                                <td>
+                                    {{ cliente.telefone }}
+                                </td>
 
-                                <!-- modal -->
-                                <div class="modal" id="modal{{ cliente.id }}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
+                                <td>
+                                    {{ cliente.email }}
+                                </td>
 
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Cliente: {{ cliente.nome }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
+                                <td>
 
-                                            <div class="modal-body text-start">
+                                    <a href="{% url 'cliente_editar' cliente.pk %}" class="text-primary me-2">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
 
-                                                {% if cliente.foto.url is not empty %}
-                                                    <div class="text-center mb-3">
-                                                        <img src="{{ cliente.foto.url }}"
-                                                             class="img-thumbnail"
-                                                             width="300" height="300">
-                                                    </div>
-                                                {% endif %}
+                                    <a href="{% url 'cliente_apagar' cliente.pk %}" class="text-danger me-2">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
 
-                                                <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
-                                                <p><strong>Email:</strong> {{ cliente.email }}</p>
+                                    <a href="#" class="text-secondary" data-bs-toggle="modal"
+                                        data-bs-target="#modal{{ cliente.id }}">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
 
-                                                <hr>
-                                                <h6 class="fw-bold">Cópias de Chaves do Cliente:</h6>
-                                                {% if cliente.emprestimos.exists %}
-                                                    <ul class="small">
-                                                        {% for emp in cliente.emprestimos.all %}
-                                                            {% if emp.copia %}
-                                                                <li>{{ emp.copia.chave.nome }} (Código: {{ emp.copia.codigo }}) - {{ emp.get_status }}</li>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% else %}
-                                                    <p class="text-muted small">Nenhuma cópia de chave</p>
-                                                {% endif %}
+                                </td>
 
-                                                <hr>
-                                                <h6 class="fw-bold">Reservas do Cliente:</h6>
-                                                {% if cliente.reservas.exists %}
-                                                    <ul class="small">
-                                                        {% for reserva in cliente.reservas.all %}
-                                                            <li>{{ reserva.propriedade.nome }} - {{ reserva.data_inicio|date:"d/m/Y" }} até {{ reserva.data_fim|date:"d/m/Y" }} ({{ reserva.status }})</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% else %}
-                                                    <p class="text-muted small">Nenhuma reserva</p>
-                                                {% endif %}
+                            </tr>
 
-                                                <hr>
-                                                <h6 class="fw-bold">Empréstimos do Cliente:</h6>
-                                                {% if cliente.emprestimos.exists %}
-                                                    <ul class="small">
-                                                        {% for emp in cliente.emprestimos.all %}
-                                                            <li>{{ emp.propriedade.nome }} - Retirada: {{ emp.data_retirada|date:"d/m/Y" }} 
-                                                            {% if emp.esta_atrasado %}<span class="badge bg-danger">Atrasado {{ emp.dias_atraso }}d - Multa: R$ {{ emp.calcular_multa }}</span>{% else %}<span class="badge bg-success">{{ emp.get_status }}</span>{% endif %}</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% else %}
-                                                    <p class="text-muted small">Nenhum empréstimo</p>
-                                                {% endif %}
+                            <!-- modal -->
+                            <div class="modal fade" id="modal{{ cliente.id }}" tabindex="-1">
 
-                                            </div>
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
 
-                                            <div class="modal-footer">
-                                                <button class="btn btn-secondary" data-bs-dismiss="modal">
-                                                    Fechar
-                                                </button>
-                                            </div>
+                                        <div class="modal-header">
+
+                                            <h5 class="modal-title">
+                                                {{ cliente.nome }}
+                                            </h5>
+
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                            </button>
 
                                         </div>
+
+                                        <div class="modal-body">
+
+                                            {% if cliente.foto %}
+                                            <div class="text-center mb-3">
+                                                <img src="{{ cliente.foto.url }}" class="img-thumbnail" width="300">
+                                            </div>
+                                            {% endif %}
+
+                                            <p>
+                                                <strong>Telefone:</strong>
+                                                {{ cliente.telefone }}
+                                            </p>
+
+                                            <p>
+                                                <strong>Email:</strong>
+                                                {{ cliente.email }}
+                                            </p>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+
+                                            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Fechar
+                                            </button>
+
+                                        </div>
+
                                     </div>
                                 </div>
 
+                            </div>
+
                             {% empty %}
-                                <tr>
-                                    <td colspan="4">Nenhum cliente cadastrado</td>
-                                </tr>
+
+                            <tr>
+                                <td colspan="4">
+                                    Nenhum cliente cadastrado
+                                </td>
+                            </tr>
+
                             {% endfor %}
+
                         </tbody>
 
                     </table>
+
                 </div>
 
                 <!-- paginação -->

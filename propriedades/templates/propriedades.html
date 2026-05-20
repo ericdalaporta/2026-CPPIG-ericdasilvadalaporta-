@@ -25,7 +25,7 @@
             </div>
         </form>
 
-        <div class="card shadow-sm mt-3">
+        <div class="card shadow mt-3">
             <div class="card-body">
 
                 <div class="row mb-4">
@@ -50,7 +50,7 @@
                             {% for propriedade in object_list %}
                                 <tr>
                                     <td class="text-start">{{ propriedade.nome }}</td>
-                                    <td>{{ propriedade.get_tipo_display_custom }}</td>
+                                    <td>{{ propriedade.get_tipo_display }}</td>
                                     <td>
                                         {% if propriedade.portao_associado %}
                                             {{ propriedade.portao_associado.nome }}
@@ -86,7 +86,7 @@
 
                                             <div class="modal-body text-center">
                                                 <p><strong>Nome:</strong> {{ propriedade.nome }}</p>
-                                                <p><strong>Tipo:</strong> {{ propriedade.get_tipo_display_custom }}</p>
+                                                <p><strong>Tipo:</strong> {{ propriedade.get_tipo_display }}</p>
                                                 {% if propriedade.portao_associado %}
                                                     <p><strong>Portão Associado:</strong> {{ propriedade.portao_associado.nome }}</p>
                                                 {% endif %}

@@ -15,7 +15,7 @@ class ChaveModelForm(forms.ModelForm): #cria um formulario baseado no model chav
 class CopiaChaveModelForm(forms.ModelForm):
     class Meta:
         model = CopiaChave
-        fields = ['codigo', 'chave', 'status', 'valor_restituicao']
+        fields = '__all__'
 
         error_messages = {
             'codigo': {'required': 'O Código é um campo obrigatório'},

@@ -2,7 +2,8 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<div class="card shadow m-3 col-md-6 mx-auto">
+<div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 200px);">
+<div class="card shadow-lg m-3 col-md-6">
     <div class="card-body">
         <div class="row">
             <h3 class="text-center mb-4">Cadastro de Empréstimo</h3>
@@ -18,19 +19,20 @@
                 <!-- cópias de chave -->
                 <div class="mb-3">
                     <label for="id_copias" class="form-label">Cópias de Chave <span class="text-danger">*</span></label>
-                    <select name="copias" id="id_copias" class="form-select {% if form.copias.errors %}is-invalid{% endif %}" multiple>
+                    <select name="copias" id="id_copias" class="form-select {% if form.copias.errors %}is-invalid{% endif %}" multiple style="min-height: 150px;">
                         {% for copia in form.copias.field.queryset %}
                             <option value="{{ copia.id }}" 
                                 data-propriedade-id="{{ copia.chave.propriedade.id }}" 
                                 data-propriedade-tipo="{{ copia.chave.propriedade.tipo }}"
-                                data-portao-nome="{% if copia.chave.propriedade.portao_associado %}{{ copia.chave.propriedade.portao_associado.nome }}{% endif %}">
-                                Cópia {{ copia.codigo }} - {{ copia.chave.nome }} ({{ copia.chave.propriedade.nome }})
+                                data-portao-nome="{% if copia.chave.propriedade.portao_associado %}{{ copia.chave.propriedade.portao_associado.nome }}{% endif %}"
+                                {% if copia.id in form.copias.value|safe %}selected{% endif %}>
+{{ copia.chave.nome }}
                             </option>
                         {% empty %}
                             <option disabled>Nenhuma cópia disponível</option>
                         {% endfor %}
                     </select>
-                    <small class="form-text text-muted">Selecione uma ou mais cópias</small>
+                    <small class="form-text text-muted">Selecione uma ou mais cópias. Ao selecionar um Chalé Exclusivo, você pode incluir a chave do Portão automaticamente</small>
                     {% if form.copias.errors %}
                         <div class="invalid-feedback d-block">
                             {% for error in form.copias.errors %}{{ error }}{% endfor %}
@@ -65,6 +67,7 @@
         </div>
     </div>
 </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -78,10 +81,14 @@ document.addEventListener('DOMContentLoaded', function() {
         let temChaleExclusivo = false;
         let primeiroPortao = '';
         
+        console.log('Opções selecionadas:', selectedOptions.length);
+        
         // verificar se alguma opção selecionada é de Chalé Exclusivo com portão
         for (let option of selectedOptions) {
             const tipo = option.dataset.propriedadeTipo;
             const portao = option.dataset.portaoNome;
+            
+            console.log('Opção:', option.text, 'Tipo:', tipo, 'Portão:', portao);
             
             if (tipo === 'CHALE_EXCLUSIVO' && portao) {
                 temChaleExclusivo = true;
@@ -91,6 +98,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             }
         }
+        
+        console.log('Tem Chalé Exclusivo com Portão:', temChaleExclusivo, 'Portão:', primeiroPortao);
         
         if (temChaleExclusivo && primeiroPortao) {
             portaoNome.textContent = primeiroPortao;
