@@ -7,55 +7,13 @@
     <div class="card-body">
         <div class="row">
             <h3 class="text-center mb-4">Cadastro de Reserva</h3>
-            <form method="POST" enctype="multipart/form-data" novalidate>
+            <form method="POST" novalidate>
                 {% csrf_token %}
                 
                 {% bootstrap_field form.cliente %}
-                
                 {% bootstrap_field form.data_inicio %}
-                
                 {% bootstrap_field form.data_fim %}
-                
                 {% bootstrap_field form.status %}
-                
-                <!-- cópias de chave -->
-                <div class="mb-3">
-                    <label for="id_copias" class="form-label">Cópias de Chave <span class="text-danger">*</span></label>
-                    <select name="copias" id="id_copias" class="form-select {% if form.copias.errors %}is-invalid{% endif %}" multiple style="min-height: 150px;">
-                        {% for copia in form.copias.field.queryset %}
-                            <option value="{{ copia.id }}"
-                                data-propriedade-id="{{ copia.chave.propriedade.id }}"
-                                data-propriedade-tipo="{{ copia.chave.propriedade.tipo }}"
-                                data-portao-nome="{% if copia.chave.propriedade.portao_associado %}{{ copia.chave.propriedade.portao_associado.nome }}{% endif %}"
-                                {% if copia.id in form.copias.value|safe %}selected{% endif %}>
-{{ copia.chave.nome }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <small class="form-text text-muted">Selecione uma ou mais cópias</small>
-                    {% if form.copias.errors %}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.copias.errors %}{{ error }}{% endfor %}
-                        </div>
-                    {% endif %}
-                    {% if form.non_field_errors %}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <!-- checkbox portão (Condicional) -->
-                <div id="portao-field" style="display: none;">
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="incluir_portao" id="incluir_portao">
-                            <label class="form-check-label" for="incluir_portao">
-                                Incluir chave do portão <strong id="portao-nome"></strong> automaticamente
-                            </label>
-                        </div>
-                    </div>
-                </div>
                 
                 <div class="text-end mt-3">
                     <button class="btn btn-primary" type="submit">Salvar</button>
@@ -68,43 +26,4 @@
     </div>
 </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const copiasSelect = document.getElementById('id_copias');
-    const portaoField = document.getElementById('portao-field');
-    const portaoNome = document.getElementById('portao-nome');
-    const incluirPortaoCheck = document.getElementById('incluir_portao');
-    
-    function verificarChaleExclusivo() {
-        const selectedOptions = Array.from(copiasSelect.selectedOptions);
-        let temChaleExclusivo = false;
-        let primeiroPortao = '';
-        
-        for (let option of selectedOptions) {
-            const tipo = option.dataset.propriedadeTipo;
-            const portao = option.dataset.portaoNome;
-            
-            if (tipo === 'CHALE_EXCLUSIVO' && portao) {
-                temChaleExclusivo = true;
-                if (!primeiroPortao) {
-                    primeiroPortao = portao;
-                }
-                break;
-            }
-        }
-        
-        if (temChaleExclusivo && primeiroPortao) {
-            portaoNome.textContent = primeiroPortao;
-            portaoField.style.display = 'block';
-        } else {
-            portaoField.style.display = 'none';
-            incluirPortaoCheck.checked = false;
-        }
-    }
-    
-    copiasSelect.addEventListener('change', verificarChaleExclusivo);
-    verificarChaleExclusivo();
-});
-</script>
 {% endblock %}

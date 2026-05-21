@@ -41,12 +41,6 @@ class ReservaAddView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('reservas')
     success_message = 'Reserva adicionada com sucesso!'
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        copias_selecionadas = self.request.POST.getlist('copias')
-        self.object.copias.set(copias_selecionadas)
-        return response
-
 
 class ReservaUpdateView(SuccessMessageMixin, UpdateView):
     model = Reserva

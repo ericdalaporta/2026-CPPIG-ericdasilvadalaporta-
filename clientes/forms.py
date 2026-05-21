@@ -5,7 +5,7 @@ from .models import Cliente
 class ClienteModelForm(forms.ModelForm):
     class Meta:
         model = Cliente
-        fields = '__all__'
+        fields = ['nome', 'telefone', 'email']
 
         error_messages = {
             'nome': {'required': 'O Nome do cliente é um campo obrigatório'},

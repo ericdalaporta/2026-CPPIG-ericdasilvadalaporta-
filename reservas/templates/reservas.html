@@ -35,6 +35,7 @@
 
                         <thead class="table-primary">
                             <tr>
+                                <th>Cliente</th>
                                 <th>Data Início</th>
                                 <th>Data Fim</th>
                                 <th>Status</th>
@@ -45,6 +46,7 @@
                         <tbody>
                             {% for reserva in object_list %}
                                 <tr>
+                                    <td>{% if reserva.cliente %}{{ reserva.cliente.nome }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
                                     <td>{{ reserva.data_inicio|date:"d/m/Y" }}</td>
                                     <td>{{ reserva.data_fim|date:"d/m/Y" }}</td>
                                     <td>{{ reserva.status }}</td>
@@ -70,11 +72,12 @@
                                         <div class="modal-content">
 
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Reserva: {{ reserva.id }}</h5>
+                                                <h5 class="modal-title">Reserva</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
                                             <div class="modal-body text-center">
+                                                <p><strong>Cliente:</strong> {% if reserva.cliente %}{{ reserva.cliente.nome }}{% else %}<span class="text-muted">-</span>{% endif %}</p>
                                                 <p><strong>Data Início:</strong> {{ reserva.data_inicio|date:"d/m/Y" }}</p>
                                                 <p><strong>Data Fim:</strong> {{ reserva.data_fim|date:"d/m/Y" }}</p>
                                                 <p><strong>Status:</strong> {{ reserva.status }}</p>
@@ -91,7 +94,7 @@
                                 </div>
                             {% empty %}
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted">Nenhuma reserva cadastrada</td>
+                                    <td colspan="5" class="text-center text-muted">Nenhuma reserva cadastrada</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

@@ -74,12 +74,13 @@
                                         <div class="modal-content">
 
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Chave: {{ chave.nome }}</h5>
+                                                <h5 class="modal-title">Chave</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
                                             <div class="modal-body text-center">
                                                 <p><strong>Nome:</strong> {{ chave.nome }}</p>
+                                                <p><strong>Propriedade:</strong> {% if chave.propriedade %}{{ chave.propriedade.nome }}{% else %}<span class="text-muted">Não vinculada</span>{% endif %}</p>
                                             </div>
 
                                             <div class="modal-footer">

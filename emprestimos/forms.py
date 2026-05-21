@@ -14,6 +14,11 @@ class EmprestimoModelForm(forms.ModelForm):
     class Meta:
         model = Emprestimo
         fields = '__all__'
+        widgets = {
+            'data_retirada': forms.DateInput(attrs={'type': 'date'}),
+            'data_prevista': forms.DateInput(attrs={'type': 'date'}),
+            'data_devolucao': forms.DateInput(attrs={'type': 'date'}),
+        }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

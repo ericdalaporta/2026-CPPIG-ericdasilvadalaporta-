@@ -1,10 +1,7 @@
-
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-
 from django.contrib import messages
-
 from .models import Cliente
 from .forms import ClienteModelForm
 
@@ -16,8 +13,8 @@ class ClientesView(ListView):
     context_object_name = 'object_list'
     paginate_by = 10
 
-    def get_queryset(self):
-        """busca clientes, filtrando se user digitou nome"""
+    def get_queryset(self): #filtra a lista de clientes
+        
         buscar = self.request.GET.get('buscar')
         qs = Cliente.objects.all()
 
@@ -26,8 +23,8 @@ class ClientesView(ListView):
 
         return qs
 
-    def get_context_data(self, **kwargs):
-        """Mostra mensagem se busca não achou nada"""
+    def get_context_data(self, **kwargs): #exibe mensagem caso n retorne nada
+  
         context = super().get_context_data(**kwargs)
         if not context['object_list'] and self.request.GET.get('buscar'):
             messages.info(self.request, 'Não existem clientes cadastrados com esse nome!')

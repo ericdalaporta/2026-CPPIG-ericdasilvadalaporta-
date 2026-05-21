@@ -80,7 +80,7 @@
                                         <div class="modal-content">
 
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Cópia: {{ copia.codigo }}</h5>
+                                                <h5 class="modal-title">Cópia</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
@@ -88,7 +88,7 @@
                                                 <p><strong>Código:</strong> {{ copia.codigo }}</p>
                                                 <p><strong>Modelo da Chave:</strong> {{ copia.chave.nome }}</p>
                                                 <p><strong>Propriedade:</strong> {% if copia.chave.propriedade %}{{ copia.chave.propriedade.nome }}{% else %}<span class="text-muted">Não vinculada</span>{% endif %}</p>
-                                                <p><strong>Status:</strong> <span class="badge {% if copia.status == 'Disponível' %}bg-success{% else %}bg-warning{% endif %}">{{ copia.status }}</span></p>
+                                                <p><strong>Status:</strong> {{ copia.status }}</p>
                                                 <p><strong>Valor Restituição:</strong> R$ {{ copia.valor_restituicao }}</p>
                                             </div>
 
