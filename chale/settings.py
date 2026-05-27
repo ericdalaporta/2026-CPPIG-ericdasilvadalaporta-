@@ -133,5 +133,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ericdasilvadalaporta@gmail.com'
-EMAIL_HOST_PASSWORD = 'curo reev ffyx bgrp'
+EMAIL_HOST_PASSWORD = 'dabq xdnj oikj rumj'
 DEFAULT_FROM_EMAIL = 'Chale'

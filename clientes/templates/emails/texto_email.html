@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        h3 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .section { margin: 20px 0; }
+        .cobranca { background-color: #fee; padding: 15px; border-left: 4px solid #e74c3c; }
+        .valor { font-size: 24px; font-weight: bold; color: #e74c3c; }
+        .banco-box { background-color: #ecf0f1; padding: 15px; border-left: 4px solid #3498db; }
+        .banco-linha { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #bdc3c7; }
+        .banco-linha strong { width: 35%; }
+        .banco-linha span { text-align: right; }
+        p { line-height: 1.6; }
+        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #bdc3c7; text-align: center; font-size: 12px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>OLÁ <strong>{{ cliente.nome }}</strong>!</h2>
+        
+        <p>Estamos enviando este e-mail para comunicar que uma cópia de chave de sua responsabilidade foi reportada como <strong style="color: #e74c3c;">PERDIDA</strong>.</p>
+        
+        <div class="section">
+            <h3>COBRANÇA</h3>
+            <p>Conforme nossa política, a perda de uma cópia de chave resulta em uma cobrança para reposição.</p>
+            <div class="cobranca">
+                <p>Valor da cobrança: <span class="valor">R$ 50,00</span></p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>DADOS BANCÁRIOS PARA PAGAMENTO</h3>
+            <div class="banco-box">
+                <div class="banco-linha">
+                    <strong>Banco:</strong>
+                    <span>Banco do Brasil</span>
+                </div>
+                <div class="banco-linha">
+                    <strong>Agência:</strong>
+                    <span>1234-5</span>
+                </div>
+                <div class="banco-linha">
+                    <strong>Conta:</strong>
+                    <span>987654-3</span>
+                </div>
+                <div class="banco-linha">
+                    <strong>Tipo de Conta:</strong>
+                    <span>Corrente</span>
+                </div>
+                <div class="banco-linha">
+                    <strong>Titular:</strong>
+                    <span>Chale Administração de Propriedades</span>
+                </div>
+                <div class="banco-linha" style="border-bottom: none;">
+                    <strong>CPF/CNPJ:</strong>
+                    <span>12.345.678/0001-90</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>INFORMAÇÕES IMPORTANTES</h3>
+            <p>• A cobrança deve ser paga no prazo de <strong>7 dias úteis</strong>.</p>
+            <p>• Favor informar o comprovante de pagamento assim que transferir.</p>
+            <p>• Caso você acredite que houve um erro nesta comunicação, favor entrar em contato conosco imediatamente.</p>
+        </div>
+        
+        <p style="margin-top: 30px;">Agradecemos pela atenção e pela confiança em nossos serviços!</p>
+        
+        <div class="footer">
+            <p><strong>Chale</strong> - Administração de Propriedades</p>
+        </div>
+    </div>
+</body>
+</html>

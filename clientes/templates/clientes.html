@@ -78,6 +78,10 @@
                                         <i class="fas fa-trash"></i>
                                     </a>
 
+                                    <a href="{% url 'cobranca_chave_perdida' cliente.pk %}" class="text-danger me-2" title="Registrar chave perdida">
+                                        <i class="fas fa-key"></i>
+                                    </a>
+
                                     <a href="#" class="text-secondary" data-bs-toggle="modal"
                                         data-bs-target="#modal{{ cliente.id }}">
                                         <i class="fas fa-eye"></i>

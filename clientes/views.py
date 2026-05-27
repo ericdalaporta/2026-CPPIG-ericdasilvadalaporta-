@@ -2,6 +2,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
 from .models import Cliente
 from .forms import ClienteModelForm
 
@@ -55,3 +58,41 @@ class ClienteDeleteView(SuccessMessageMixin, DeleteView):
     template_name = 'cliente_apagar.html'
     success_url = reverse_lazy('clientes')
     success_message = 'Cliente apagado com sucesso'
+
+
+def enviar_cobranca_chave_perdida(request, pk): # Envia email de cobrança por chave perdida
+    """
+    Envia email de cobrança ao cliente por chave perdida
+    """
+    # Busca o cliente no banco de dados pelo ID (pk)
+    # Se não encontrar, retorna erro 404
+    cliente = get_object_or_404(Cliente, pk=pk)
+    
+    # Cria uma lista com o email do cliente
+    email = []
+    email.append(cliente.email)
+    
+    # Prepara os dados que vão ser usados nos templates de email
+    dados = {'cliente': cliente}
+    
+    # Renderiza o template de texto puro (arquivo .txt)
+    texto_email = render_to_string('emails/texto_email.txt', dados)
+    
+    # Renderiza o template HTML (arquivo .html) com formatação bonita
+    html_email = render_to_string('emails/texto_email.html', dados)
+    
+    # Envia o email para o cliente
+    send_mail(
+        subject='Cobrança por Chave Perdida - Chale',  # Assunto do email
+        message=texto_email,  # Corpo do email em texto puro
+        from_email='ericdasilvadalaporta@gmail.com',  # Email de origem
+        recipient_list=email,  # Lista de destinatários
+        html_message=html_email,  # Versão HTML do email
+        fail_silently=False,  # Se False, mostra erro caso falhe
+    )
+    
+    # Mostra mensagem de sucesso ao usuário
+    messages.success(request, f'Email de cobrança enviado para {cliente.email}')
+    
+    # Redireciona de volta para a lista de clientes
+    return redirect('clientes')

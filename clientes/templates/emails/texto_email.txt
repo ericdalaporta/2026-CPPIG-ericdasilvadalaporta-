@@ -1,0 +1,26 @@
+OLÁ {{ cliente.nome }}!
+
+Estamos enviando este e-mail para comunicar que uma cópia de chave de sua responsabilidade foi reportada como PERDIDA.
+
+COBRANÇA
+Conforme nossa política, a perda de uma cópia de chave resulta em uma cobrança para reposição.
+
+Valor da cobrança: R$ 50,00
+
+DADOS BANCÁRIOS PARA PAGAMENTO
+Banco: Banco do Brasil
+Agência: 1234-5
+Conta: 987654-3
+Tipo de Conta: Corrente
+Titular: Chale Administração de Propriedades
+CPF/CNPJ: 12.345.678/0001-90
+
+INFORMAÇÕES IMPORTANTES
+A cobrança deve ser paga no prazo de 7 dias úteis.
+Favor informar o comprovante de pagamento assim que transferir.
+Caso você acredite que houve um erro nesta comunicação, favor entrar em contato conosco imediatamente.
+
+Agradecemos pela atenção e pela confiança em nossos serviços!
+
+Atenciosamente,
+Chale - Administração de Propriedades
