@@ -51,11 +51,18 @@
                                     <td>{{ emprestimo.data_retirada|date:"d/m/Y" }}</td>
                                     <td>{{ emprestimo.data_prevista|date:"d/m/Y" }}</td>
                                     <td>
-                                        {% if emprestimo.esta_atrasado %}
-                                            Atrasado ({{ emprestimo.dias_atraso }}d)
-                                        {% else %}
-                                            {{ emprestimo.get_status }}
-                                        {% endif %}
+                                        <span class="status-text" 
+                                              data-emprestimo-id="{{ emprestimo.id }}"
+                                              style="cursor: pointer; user-select: none;"
+                                              title="Clique para alterar">
+                                            {% if emprestimo.esta_atrasado %}
+                                                <span class="badge bg-danger">Atrasado ({{ emprestimo.dias_atraso }}d)</span>
+                                            {% elif emprestimo.ativo %}
+                                                <span class="badge bg-warning">Ocupado</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Disponível</span>
+                                            {% endif %}
+                                        </span>
                                     </td>
                                     <td>
                                         {% if emprestimo.esta_atrasado %}
@@ -86,27 +93,19 @@
                                         <div class="modal-content">
 
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Empréstimo</h5>
+                                                <h5 class="modal-title">Empréstimo #{{ emprestimo.id }}</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
                                             <div class="modal-body">
                                                 <p><strong>Cliente:</strong> {{ emprestimo.cliente.nome }}</p>
                                                 
-                                                <h6 class="mt-3 mb-2">Cópias de Chave:</h6>
+                                                <h6 class="mt-3 mb-2">Cópias de Chave Emprestadas:</h6>
                                                 <ul style="margin-bottom: 0;">
                                                 {% for item in emprestimo.itens.all %}
                                                     <li>{{ item.copia_chave.chave.nome }}</li>
                                                 {% endfor %}
                                                 </ul>
-
-                                                <div class="mt-3">
-                                                    <label class="form-label"><strong>Data de Devolução</strong></label>
-                                                    <div class="input-group">
-                                                        <input type="date" class="form-control data-devolucao" id="data_dev_{{ emprestimo.id }}" value="{% if emprestimo.data_devolucao %}{{ emprestimo.data_devolucao|date:'Y-m-d' }}{% endif %}">
-                                                        <button class="btn btn-primary" type="button" onclick="salvarDevolucao({{ emprestimo.id }})">Salvar</button>
-                                                    </div>
-                                                </div>
                                             </div>
 
                                             <div class="modal-footer">
@@ -136,33 +135,60 @@
 </section>
 
 <script>
-function salvarDevolucao(emprestimoId) {
-    const dataDevolucao = document.getElementById('data_dev_' + emprestimoId).value;
+document.addEventListener('DOMContentLoaded', function() {
+    const statusTexts = document.querySelectorAll('.status-text');
     
-    if (!dataDevolucao) {
-        alert('Digite uma data!');
-        return;
-    }
-
-    fetch(`/emprestimos/${emprestimoId}/salvar-devolucao/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken')
-        },
-        body: JSON.stringify({ data_devolucao: dataDevolucao })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Devolução registrada! Multa encerrada.');
-            location.reload();
-        } else {
-            alert('Erro: ' + data.error);
-        }
-    })
-    .catch(error => console.error('Erro:', error));
-}
+    statusTexts.forEach(element => {
+        element.addEventListener('click', function() {
+            const emprestimoId = this.dataset.emprestimoId;
+            const badge = this.querySelector('.badge');
+            const isAtraso = badge.classList.contains('bg-danger');
+            
+            // Se está atrasado (bg-danger) ou ocupado (bg-warning), desativa
+            const ativoAtualmente = badge.classList.contains('bg-warning') || isAtraso;
+            const novoAtivo = !ativoAtualmente;
+            
+            const formData = new FormData();
+            formData.append('ativo', novoAtivo ? 'true' : 'false');
+            
+            fetch(`/${emprestimoId}/emprestimo/toggle-disponibilidade/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken')
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Encontrar a linha (tr) e a célula de multa
+                    const row = this.closest('tr');
+                    const multaCell = row.querySelectorAll('td')[4]; // 5ª coluna é a multa
+                    
+                    // Atualizar o badge
+                    if (novoAtivo) {
+                        badge.textContent = 'Ocupado';
+                        badge.classList.remove('bg-success', 'bg-danger');
+                        badge.classList.add('bg-warning');
+                    } else {
+                        badge.textContent = 'Disponível';
+                        badge.classList.remove('bg-warning', 'bg-danger');
+                        badge.classList.add('bg-success');
+                        // Quando desativa, a multa some
+                        multaCell.textContent = '-';
+                    }
+                } else {
+                    console.error('Erro da API:', data);
+                    alert('Erro ao alterar status: ' + (data.error || 'Erro desconhecido'));
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição:', error);
+                alert('Erro ao alterar status: ' + error.message);
+            });
+        });
+    });
+});
 
 function getCookie(name) {
     let cookieValue = null;

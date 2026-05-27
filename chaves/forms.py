@@ -20,5 +20,4 @@ class CopiaChaveModelForm(forms.ModelForm):
         error_messages = {
             'codigo': {'required': 'O Código é um campo obrigatório'},
             'status': {'required': 'O Status é um campo obrigatório'},
-            'valor_restituicao': {'required': 'O Valor de Restituição é um campo obrigatório'},
         }

@@ -12,13 +12,14 @@ class Propriedade(models.Model):
     tipo = models.CharField('Tipo', max_length=50, choices=TIPO_CHOICES, help_text='Tipo de propriedade') 
     
     portao_associado = models.ForeignKey( 
-        'propriedades.Portao',
+        'propriedades.Propriedade',
         verbose_name='Portão Associado',
         help_text='Portão associado a este chalé exclusivo',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='chales_exclusivos'
+        related_name='chales_exclusivos',
+        limit_choices_to={'tipo': 'PORTAO'}
     )
 
     class Meta:

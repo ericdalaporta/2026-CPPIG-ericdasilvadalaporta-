@@ -17,7 +17,6 @@ class EmprestimoModelForm(forms.ModelForm):
         widgets = {
             'data_retirada': forms.DateInput(attrs={'type': 'date'}),
             'data_prevista': forms.DateInput(attrs={'type': 'date'}),
-            'data_devolucao': forms.DateInput(attrs={'type': 'date'}),
         }
     
     def __init__(self, *args, **kwargs):

@@ -39,7 +39,6 @@
                                 <th>Chave</th>
                                 <th>Propriedade</th>
                                 <th>Status</th>
-                                <th>Valor Restituição</th>
                                 <th style="width: 150px;">Ações</th>
                             </tr>
                         </thead>
@@ -57,7 +56,6 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ copia.get_status_display }}</td>
-                                    <td>R$ {{ copia.valor_restituicao }}</td>
 
                                     <td>
                                         <a href="{% url 'copia_editar' copia.pk %}" class="text-primary me-2" title="Editar">
@@ -89,7 +87,6 @@
                                                 <p><strong>Modelo da Chave:</strong> {{ copia.chave.nome }}</p>
                                                 <p><strong>Propriedade:</strong> {% if copia.chave.propriedade %}{{ copia.chave.propriedade.nome }}{% else %}<span class="text-muted">Não vinculada</span>{% endif %}</p>
                                                 <p><strong>Status:</strong> {{ copia.status }}</p>
-                                                <p><strong>Valor Restituição:</strong> R$ {{ copia.valor_restituicao }}</p>
                                             </div>
 
                                             <div class="modal-footer">

@@ -60,12 +60,6 @@ class CopiaChave(models.Model):
         blank=False, 
         help_text='Status da cópia da chave'
     )
-    
-    valor_restituicao = models.FloatField( #float field eh pra criar campo decimal obviamente
-        'Valor Restituição', 
-        blank=False, 
-        help_text='Valor de restituição da cópia'
-    )
 
     class Meta:
         verbose_name = 'Cópia de Chave'
