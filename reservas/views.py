@@ -6,13 +6,15 @@ from django.contrib import messages
 
 from .models import Reserva
 from .forms import ReservaModelForm
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
-class ReservasView(ListView):
+class ReservasView(PermissionRequiredMixin, ListView):
     model = Reserva
     template_name = 'reservas.html'
     context_object_name = 'object_list'
     paginate_by = 10
+    permission_required = 'reservas.view_reserva'
 
     def get_queryset(self):
         buscar = self.request.GET.get('buscar')
@@ -34,20 +36,22 @@ class ReservasView(ListView):
         return context
 
 
-class ReservaAddView(SuccessMessageMixin, CreateView):
+class ReservaAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     model = Reserva
     form_class = ReservaModelForm
     template_name = 'reserva_form.html'
     success_url = reverse_lazy('reservas')
     success_message = 'Reserva adicionada com sucesso!'
+    permission_required = 'reservas.add_reserva'
 
 
-class ReservaUpdateView(SuccessMessageMixin, UpdateView):
+class ReservaUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Reserva
     form_class = ReservaModelForm
     template_name = 'reserva_form.html'
     success_url = reverse_lazy('reservas')
     success_message = 'Reserva alterada com sucesso!'
+    permission_required = 'reservas.change_reserva'
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -56,8 +60,13 @@ class ReservaUpdateView(SuccessMessageMixin, UpdateView):
         return response
 
 
-class ReservaDeleteView(SuccessMessageMixin, DeleteView):
+class ReservaDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Reserva
+    template_name = 'reserva_apagar.html'
+    success_url = reverse_lazy('reservas')
+    success_message = 'Reserva apagada com sucesso!'
+    permission_required = 'reservas.delete_reserva'
+
     template_name = 'reserva_apagar.html'
     success_url = reverse_lazy('reservas')
     success_message = 'Reserva apagada com sucesso!'

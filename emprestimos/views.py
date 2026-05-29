@@ -7,6 +7,7 @@ from datetime import date
 from .models import Emprestimo, ItemEmprestimo
 from .forms import EmprestimoModelForm
 from chaves.models import CopiaChave
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 # =============================================
@@ -51,7 +52,7 @@ def devolver_itens(emprestimo): # marca todos os itens como devolvidos e libera 
 # LISTAR - Mostra todos os empréstimos
 # =============================================
 
-class EmprestimosView(ListView): # mostra a lista de emprréstimos com opção de busca por cliente ou id
+class EmprestimosView(PermissionRequiredMixin, ListView): # mostra a lista de emprréstimos com opção de busca por cliente ou id
     """Exibe a lista de empréstimos com opção de busca."""
     
     model = Emprestimo
@@ -72,19 +73,22 @@ class EmprestimosView(ListView): # mostra a lista de emprréstimos com opção d
             )
         
         return emprestimos
+    
+    permission_required = 'emprestimos.view_emprestimo'
 
 
 # =============================================
 # CRIAR - Novo empréstimo
 # =============================================
 
-class EmprestimoAddView(SuccessMessageMixin, CreateView):
+class EmprestimoAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 
     model = Emprestimo
     form_class = EmprestimoModelForm
     template_name = 'emprestimo_form.html'
     success_url = reverse_lazy('emprestimos')
     success_message = 'Empréstimo criado com sucesso!'
+    permission_required = 'emprestimos.add_emprestimo'
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -100,14 +104,14 @@ class EmprestimoAddView(SuccessMessageMixin, CreateView):
 # EDITAR - Modifica um empréstimo
 # =============================================
 
-class EmprestimoUpdateView(SuccessMessageMixin, UpdateView):
+class EmprestimoUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     
     model = Emprestimo
     form_class = EmprestimoModelForm
     template_name = 'emprestimo_form.html'
     success_url = reverse_lazy('emprestimos')
     success_message = 'Empréstimo atualizado com sucesso!'
-
+    permission_required = 'emprestimos.change_emprestimo'
     def form_valid(self, form):
 
         # Libera cópias antigas
@@ -130,11 +134,12 @@ class EmprestimoUpdateView(SuccessMessageMixin, UpdateView):
 # DELETAR - Remove um empréstimo
 # =============================================
 
-class EmprestimoDeleteView(DeleteView):
+class EmprestimoDeleteView(PermissionRequiredMixin, DeleteView):
 
     model = Emprestimo
     template_name = 'emprestimo_apagar.html'
     success_url = reverse_lazy('emprestimos')
+    permission_required = 'emprestimos.delete_emprestimo'
 
     def delete(self, request, *args, **kwargs):
         
@@ -152,8 +157,9 @@ class EmprestimoDeleteView(DeleteView):
 # TOGGLE - Alterna entre OCUPADO e DISPONÍVEL
 # =============================================
 
-class EmprestimoToggleDisponibilidadeView(View): # clicar no badge de status pra ir de ocupado pra disponivel (copias liberadas)
+class EmprestimoToggleDisponibilidadeView(PermissionRequiredMixin, View): # clicar no badge de status pra ir de ocupado pra disponivel (copias liberadas)
   
+    permission_required = 'emprestimos.change_emprestimo'
     #Feito via AJAX (sem recarregar a página).
 
     def post(self, request, pk): # altera o status do emprestimo

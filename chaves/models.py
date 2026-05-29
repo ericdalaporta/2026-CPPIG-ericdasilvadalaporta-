@@ -21,8 +21,10 @@ class Chave(models.Model):
     )
 
     class Meta:
+        permissions = (('view_chave', 'Pode visualizar chaves'),)
         verbose_name = 'Chave'
         verbose_name_plural = 'Chaves'
+        permissions = (('view_chave', 'Pode visualizar chaves'),)
 
     def __str__(self):
         return self.nome
@@ -64,6 +66,7 @@ class CopiaChave(models.Model):
     class Meta:
         verbose_name = 'Cópia de Chave'
         verbose_name_plural = 'Cópias de Chaves'
+        permissions = (('view_copiachave', 'Pode visualizar cópias de chave'),)
 
     def __str__(self):
         return f'Cópia {self.codigo}'

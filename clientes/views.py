@@ -7,14 +7,16 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from .models import Cliente
 from .forms import ClienteModelForm
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
-class ClientesView(ListView):
+class ClientesView(PermissionRequiredMixin, ListView):
     
     model = Cliente
     template_name = 'clientes.html'
     context_object_name = 'object_list'
     paginate_by = 10
+    permission_required = 'clientes.view_cliente'
 
     def get_queryset(self): #filtra a lista de clientes
         
@@ -34,30 +36,33 @@ class ClientesView(ListView):
         return context
 
 
-class ClienteAddView(SuccessMessageMixin, CreateView):
+class ClienteAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     
     model = Cliente
     form_class = ClienteModelForm
     template_name = 'cliente_form.html'
     success_url = reverse_lazy('clientes')
     success_message = 'Cliente adicionado com sucesso!'
+    permission_required = 'clientes.add_cliente'
 
 
-class ClienteUpdateView(SuccessMessageMixin, UpdateView):
+class ClienteUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
    
     model = Cliente
     form_class = ClienteModelForm
     template_name = 'cliente_form.html'
     success_url = reverse_lazy('clientes')
     success_message = 'Cliente alterado com sucesso!'
+    permission_required = 'clientes.change_cliente'
 
 
-class ClienteDeleteView(SuccessMessageMixin, DeleteView):
+class ClienteDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
 
     model = Cliente
     template_name = 'cliente_apagar.html'
     success_url = reverse_lazy('clientes')
     success_message = 'Cliente apagado com sucesso'
+    permission_required = 'clientes.delete_cliente'
 
 
 def enviar_cobranca_chave_perdida(request, pk): # Envia email de cobrança por chave perdida

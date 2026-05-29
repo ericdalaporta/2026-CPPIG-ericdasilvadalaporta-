@@ -36,6 +36,7 @@ class Emprestimo(models.Model):
     class Meta:
         verbose_name = 'Empréstimo'
         verbose_name_plural = 'Empréstimos'
+        permissions = (('view_emprestimo', 'Pode visualizar empréstimos'),)
 
     def __str__(self):
         return f'Empréstimo {self.id}'
@@ -114,6 +115,7 @@ class ItemEmprestimo(models.Model):
         verbose_name = 'Item Empréstimo'
         verbose_name_plural = 'Itens Empréstimos'
         unique_together = ('emprestimo', 'copia_chave')
+        permissions = (('view_item_emprestimo', 'Pode visualizar itens de empréstimo'),)
 
     def __str__(self):
         return f'Item {self.id} - {self.copia_chave}'

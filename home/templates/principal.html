@@ -24,7 +24,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
 
             <ul class="navbar-nav ms-auto">
-
+                {% if request.user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark" href="#" data-bs-toggle="dropdown">
                         Clientes
@@ -84,9 +84,32 @@
                         <li><a class="dropdown-item" href="{% url 'reservas' %}">Listar Reservas</a></li>
                     </ul>
                 </li>
-
+                
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarlogin" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Usuário: {{ request.user.username }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'alterar_senha' %}">Alterar Senha</a></li>
+                        <li>
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button class="btn btn-link dropdown-item" type="submit">Log Out</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarAcesso" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Acesso
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
+                    </ul>
+                </li>
+            {% endif %}
             </ul>
-
         </div>
     </div>
 </nav>
