@@ -10,7 +10,6 @@ class Reserva(models.Model):
     class Meta:
         verbose_name = 'Reserva'
         verbose_name_plural = 'Reservas'
-        permissions = (('view_reserva', 'Pode visualizar reservas'),)
 
     def __str__(self):
         return f'Reserva {self.id}'

@@ -80,7 +80,7 @@ class CopiasChaveView(PermissionRequiredMixin, ListView):
             messages.info(self.request, 'Não existem cópias cadastradas com esse código!')
         return context
 
-class CopiaChaveAddView(SuccessMessageMixin, CreateView):
+class CopiaChaveAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     model = CopiaChave
     form_class = CopiaChaveModelForm
     template_name = 'copia_form.html'

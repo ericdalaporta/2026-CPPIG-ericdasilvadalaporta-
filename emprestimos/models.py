@@ -36,7 +36,6 @@ class Emprestimo(models.Model):
     class Meta:
         verbose_name = 'Empréstimo'
         verbose_name_plural = 'Empréstimos'
-        permissions = (('view_emprestimo', 'Pode visualizar empréstimos'),)
 
     def __str__(self):
         return f'Empréstimo {self.id}'

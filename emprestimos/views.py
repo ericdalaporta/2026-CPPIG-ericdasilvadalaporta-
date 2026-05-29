@@ -134,11 +134,12 @@ class EmprestimoUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateV
 # DELETAR - Remove um empréstimo
 # =============================================
 
-class EmprestimoDeleteView(PermissionRequiredMixin, DeleteView):
+class EmprestimoDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
 
     model = Emprestimo
     template_name = 'emprestimo_apagar.html'
     success_url = reverse_lazy('emprestimos')
+    success_message = 'Empréstimo apagado com sucesso!'
     permission_required = 'emprestimos.delete_emprestimo'
 
     def delete(self, request, *args, **kwargs):

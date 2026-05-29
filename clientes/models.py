@@ -34,7 +34,6 @@ class Cliente(models.Model):
     class Meta:
         verbose_name = 'Cliente'
         verbose_name_plural = 'Clientes'
-        permissions = (('view_cliente', 'Pode visualizar clientes'),)
 
     def __str__(self):
         return self.nome
