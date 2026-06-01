@@ -53,12 +53,6 @@ class ReservaUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView
     success_message = 'Reserva alterada com sucesso!'
     permission_required = 'reservas.change_reserva'
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        copias_selecionadas = self.request.POST.getlist('copias')
-        self.object.copias.set(copias_selecionadas)
-        return response
-
 
 class ReservaDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Reserva
@@ -73,3 +67,4 @@ class ReservaDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView
         email = []
         email.append(reserva.cliente.email)
         # preciso refazer essa parte toda, não tenho nada do que tem no lavacar
+

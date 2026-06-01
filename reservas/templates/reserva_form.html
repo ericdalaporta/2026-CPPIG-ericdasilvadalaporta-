@@ -11,6 +11,9 @@
                 {% csrf_token %}
                 
                 {% bootstrap_field form.cliente %}
+                
+                {% bootstrap_field form.chaves %}
+                
                 {% bootstrap_field form.data_inicio %}
                 {% bootstrap_field form.data_fim %}
                 {% bootstrap_field form.status %}
