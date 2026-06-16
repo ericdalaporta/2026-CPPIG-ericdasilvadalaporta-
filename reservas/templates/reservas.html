@@ -36,7 +36,6 @@
                         <thead class="table-primary">
                             <tr>
                                 <th>Cliente</th>
-                                <th>Chaves</th>
                                 <th>Data Início</th>
                                 <th>Data Fim</th>
                                 <th>Status</th>
@@ -48,17 +47,6 @@
                             {% for reserva in object_list %}
                                 <tr>
                                     <td>{% if reserva.cliente %}{{ reserva.cliente.nome }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
-                                    <td>
-                                        {% if reserva.chaves.all %}
-                                            <small>
-                                                {% for chave in reserva.chaves.all %}
-                                                    <span class="badge bg-info">{{ chave.nome }}</span>
-                                                {% endfor %}
-                                            </small>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
                                     <td>{{ reserva.data_inicio|date:"d/m/Y" }}</td>
                                     <td>{{ reserva.data_fim|date:"d/m/Y" }}</td>
                                     <td>{{ reserva.status }}</td>

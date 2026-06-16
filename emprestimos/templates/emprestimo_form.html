@@ -16,28 +16,37 @@
                 
                 {% bootstrap_field form.data_prevista %}
                 
-                <!-- cópias de chave -->
+                <!-- cópias de chave com checkboxes -->
                 <div class="mb-3">
-                    <label for="id_copias" class="form-label">Cópias de Chave <span class="text-danger">*</span></label>
-                    <select name="copias" id="id_copias" class="form-select {% if form.copias.errors %}is-invalid{% endif %}" multiple style="min-height: 150px;">
-                        {% for copia in form.copias.field.queryset %}
-                            <option value="{{ copia.id }}" 
-                                data-propriedade-id="{{ copia.chave.propriedade.id }}" 
-                                data-propriedade-tipo="{{ copia.chave.propriedade.tipo }}"
-                                data-portao-nome="{% if copia.chave.propriedade.portao_associado %}{{ copia.chave.propriedade.portao_associado.nome }}{% endif %}"
-                                {% if copia.id in form.copias.value|safe %}selected{% endif %}>
-{{ copia.chave.nome }}
-                            </option>
-                        {% empty %}
-                            <option disabled>Nenhuma cópia disponível</option>
-                        {% endfor %}
-                    </select>
-                    <small class="form-text text-muted">Selecione uma ou mais cópias. Ao selecionar um Chalé Exclusivo, você pode incluir a chave do Portão automaticamente</small>
+                    <label class="form-label">Cópias de Chave <span class="text-danger">*</span></label>
                     {% if form.copias.errors %}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.copias.errors %}{{ error }}{% endfor %}
-                        </div>
+                        <div class="text-danger small">{{ form.copias.errors }}</div>
                     {% endif %}
+                    <div class="row g-3 mt-1">
+                            {% for copia in form.copias.field.queryset %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input 
+                                            class="form-check-input copia-checkbox" 
+                                            type="checkbox" 
+                                            name="copias" 
+                                            value="{{ copia.id }}" 
+                                            id="id_copias_{{ forloop.counter }}"
+                                            data-propriedade-id="{{ copia.chave.propriedade.id }}"
+                                            data-propriedade-tipo="{{ copia.chave.propriedade.tipo }}"
+                                            data-portao-nome="{% if copia.chave.propriedade.portao_associado %}{{ copia.chave.propriedade.portao_associado.nome }}{% endif %}"
+                                            {% if copia.id in form.copias.value|safe %}checked{% endif %}
+                                        >
+                                        <label class="form-check-label" for="id_copias_{{ forloop.counter }}">
+                                            {{ copia.chave.nome }} (Cód: {{ copia.codigo }})
+                                        </label>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">Nenhuma cópia disponível</p>
+                            {% endfor %}
+                        </div>
+                    <small class="form-text text-muted d-block mt-2">Selecione uma ou mais cópias. Ao selecionar um Chalé Exclusivo, você pode incluir a chave do Portão automaticamente</small>
                     {% if form.non_field_errors %}
                         <div class="invalid-feedback d-block">
                             {% for error in form.non_field_errors %}{{ error }}{% endfor %}
@@ -71,35 +80,30 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const copiasSelect = document.getElementById('id_copias');
+    const copiaCheckboxes = document.querySelectorAll('.copia-checkbox');
     const portaoField = document.getElementById('portao-field');
     const portaoNome = document.getElementById('portao-nome');
     const incluirPortaoCheck = document.getElementById('incluir_portao');
     
     function verificarChaleExclusivo() {
-        const selectedOptions = Array.from(copiasSelect.selectedOptions);
         let temChaleExclusivo = false;
         let primeiroPortao = '';
         
-        console.log('Opções selecionadas:', selectedOptions.length);
-        
-        // verificar se alguma opção selecionada é de Chalé Exclusivo com portão
-        for (let option of selectedOptions) {
-            const tipo = option.dataset.propriedadeTipo;
-            const portao = option.dataset.portaoNome;
-            
-            console.log('Opção:', option.text, 'Tipo:', tipo, 'Portão:', portao);
-            
-            if (tipo === 'CHALE_EXCLUSIVO' && portao) {
-                temChaleExclusivo = true;
-                if (!primeiroPortao) {
-                    primeiroPortao = portao;
+        // Verificar se alguma checkbox selecionada é de Chalé Exclusivo com portão
+        for (let checkbox of copiaCheckboxes) {
+            if (checkbox.checked) {
+                const tipo = checkbox.dataset.propriedadeTipo;
+                const portao = checkbox.dataset.portaoNome;
+                
+                if (tipo === 'CHALE_EXCLUSIVO' && portao) {
+                    temChaleExclusivo = true;
+                    if (!primeiroPortao) {
+                        primeiroPortao = portao;
+                    }
+                    break;
                 }
-                break;
             }
         }
-        
-        console.log('Tem Chalé Exclusivo com Portão:', temChaleExclusivo, 'Portão:', primeiroPortao);
         
         if (temChaleExclusivo && primeiroPortao) {
             portaoNome.textContent = primeiroPortao;
@@ -110,7 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    copiasSelect.addEventListener('change', verificarChaleExclusivo);
+    // Adicionar event listener a cada checkbox
+    copiaCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', verificarChaleExclusivo);
+    });
+    
     verificarChaleExclusivo();
 });
 </script>

@@ -12,7 +12,34 @@
                 
                 {% bootstrap_field form.cliente %}
                 
-                {% bootstrap_field form.chaves %}
+                <!-- Campo de Chaves com Checkboxes -->
+                <div class="mb-3">
+                    <label class="form-label">{{ form.chaves.label }} <span class="text-danger">*</span></label>
+                    {% if form.chaves.errors %}
+                        <div class="text-danger small">{{ form.chaves.errors }}</div>
+                    {% endif %}
+                    <div class="row g-3 mt-1">
+                            {% for choice_value, choice_text in form.chaves.field.choices %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="checkbox" 
+                                            name="{{ form.chaves.name }}" 
+                                            value="{{ choice_value }}" 
+                                            id="id_{{ form.chaves.name }}_{{ forloop.counter }}"
+                                            {% if choice_value in form.chaves.value %}checked{% endif %}
+                                        >
+                                        <label class="form-check-label" for="id_{{ form.chaves.name }}_{{ forloop.counter }}">
+                                            {{ choice_text }}
+                                        </label>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">Nenhuma chave disponível</p>
+                            {% endfor %}
+                    </div>
+                </div>
                 
                 {% bootstrap_field form.data_inicio %}
                 {% bootstrap_field form.data_fim %}
