@@ -50,22 +50,32 @@
                                     <td>{{ emprestimo.cliente.nome }}</td>
                                     <td>{{ emprestimo.data_retirada|date:"d/m/Y" }}</td>
                                     <td>{{ emprestimo.data_prevista|date:"d/m/Y" }}</td>
+
                                     <td>
-                                        <span class="status-text" 
+                                        <span class="status-text"
                                               data-emprestimo-id="{{ emprestimo.id }}"
+                                              data-ativo="{{ emprestimo.ativo|yesno:'true,false' }}"
                                               style="cursor: pointer; user-select: none;"
-                                              title="Clique para alterar">
+                                              title="Clique para concluir">
+
                                             {% if emprestimo.esta_atrasado %}
-                                                <span class="badge bg-danger">Atrasado ({{ emprestimo.dias_atraso }}d)</span>
+                                                <span class="badge bg-danger">
+                                                    Atrasado ({{ emprestimo.dias_atraso }}d)
+                                                </span>
                                             {% elif emprestimo.ativo %}
-                                                <span class="badge bg-warning">Ocupado</span>
+                                                <span class="badge bg-warning">
+                                                    Em andamento
+                                                </span>
                                             {% else %}
-                                                <span class="badge bg-success">Disponível</span>
+                                                <span class="badge bg-success">
+                                                    Concluído
+                                                </span>
                                             {% endif %}
                                         </span>
                                     </td>
+
                                     <td>
-                                        {% if emprestimo.esta_atrasado %}
+                                        {% if emprestimo.calcular_multa > 0 %}
                                             R$ {{ emprestimo.calcular_multa|floatformat:2 }}
                                         {% else %}
                                             -
@@ -73,51 +83,76 @@
                                     </td>
 
                                     <td>
-                                        <a href="{% url 'emprestimo_editar' emprestimo.pk %}" class="text-primary me-2" title="Editar">
+                                        <a href="{% url 'emprestimo_editar' emprestimo.pk %}"
+                                           class="text-primary me-2"
+                                           title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <a href="{% url 'emprestimo_apagar' emprestimo.pk %}" class="text-danger me-2" title="Deletar">
+                                        <a href="{% url 'emprestimo_apagar' emprestimo.pk %}"
+                                           class="text-danger me-2"
+                                           title="Deletar">
                                             <i class="fas fa-trash"></i>
                                         </a>
 
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ emprestimo.id }}" class="text-secondary" title="Ver detalhes">
+                                        <a href="#"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#modal{{ emprestimo.id }}"
+                                           class="text-secondary"
+                                           title="Ver detalhes">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
 
-                                <!-- modal -->
                                 <div class="modal fade" id="modal{{ emprestimo.id }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
 
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Empréstimo #{{ emprestimo.id }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                <h5 class="modal-title">
+                                                    Empréstimo #{{ emprestimo.id }}
+                                                </h5>
+
+                                                <button type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal">
+                                                </button>
                                             </div>
 
                                             <div class="modal-body">
-                                                <p><strong>Cliente:</strong> {{ emprestimo.cliente.nome }}</p>
-                                                
-                                                <h6 class="mt-3 mb-2">Cópias de Chave Emprestadas:</h6>
+                                                <p>
+                                                    <strong>Cliente:</strong>
+                                                    {{ emprestimo.cliente.nome }}
+                                                </p>
+
+                                                <h6 class="mt-3 mb-2">
+                                                    Cópias de Chave Emprestadas:
+                                                </h6>
+
                                                 <ul style="margin-bottom: 0;">
-                                                {% for item in emprestimo.itens.all %}
-                                                    <li>{{ item.copia_chave.chave.nome }}</li>
-                                                {% endfor %}
+                                                    {% for item in emprestimo.itens.all %}
+                                                        <li>{{ item.copia_chave.chave.nome }}</li>
+                                                    {% endfor %}
                                                 </ul>
                                             </div>
 
                                             <div class="modal-footer">
-                                                <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                                <button class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">
+                                                    Fechar
+                                                </button>
                                             </div>
 
                                         </div>
                                     </div>
                                 </div>
+
                             {% empty %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">Nenhum empréstimo cadastrado</td>
+                                    <td colspan="6" class="text-center text-muted">
+                                        Nenhum empréstimo cadastrado
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -125,7 +160,6 @@
                 </div>
             </div>
 
-            <!-- paginacao do bootstrap -->
             <div class="d-flex justify-content-center mt-3">
                 {% bootstrap_pagination page_obj %}
             </div>
@@ -137,54 +171,32 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const statusTexts = document.querySelectorAll('.status-text');
-    
+
     statusTexts.forEach(element => {
         element.addEventListener('click', function() {
+
+            if (this.dataset.ativo === 'false') {
+                return;
+            }
+
             const emprestimoId = this.dataset.emprestimoId;
-            const badge = this.querySelector('.badge');
-            const isAtraso = badge.classList.contains('bg-danger');
-            
-            // Se está atrasado (bg-danger) ou ocupado (bg-warning), desativa
-            const ativoAtualmente = badge.classList.contains('bg-warning') || isAtraso;
-            const novoAtivo = !ativoAtualmente;
-            
-            const formData = new FormData();
-            formData.append('ativo', novoAtivo ? 'true' : 'false');
-            
+
             fetch(`/${emprestimoId}/emprestimo/toggle-disponibilidade/`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken')
-                },
-                body: formData
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Encontrar a linha (tr) e a célula de multa
-                    const row = this.closest('tr');
-                    const multaCell = row.querySelectorAll('td')[4]; // 5ª coluna é a multa
-                    
-                    // Atualizar o badge
-                    if (novoAtivo) {
-                        badge.textContent = 'Ocupado';
-                        badge.classList.remove('bg-success', 'bg-danger');
-                        badge.classList.add('bg-warning');
-                    } else {
-                        badge.textContent = 'Disponível';
-                        badge.classList.remove('bg-warning', 'bg-danger');
-                        badge.classList.add('bg-success');
-                        // Quando desativa, a multa some
-                        multaCell.textContent = '-';
-                    }
+                    location.reload();
                 } else {
-                    console.error('Erro da API:', data);
-                    alert('Erro ao alterar status: ' + (data.error || 'Erro desconhecido'));
+                    alert('Erro: ' + data.error);
                 }
             })
             .catch(error => {
-                console.error('Erro na requisição:', error);
-                alert('Erro ao alterar status: ' + error.message);
+                alert('Erro ao concluir empréstimo.');
             });
         });
     });
@@ -192,18 +204,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function getCookie(name) {
     let cookieValue = null;
+
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(
+                    cookie.substring(name.length + 1)
+                );
                 break;
             }
         }
     }
+
     return cookieValue;
 }
 </script>
 
 {% endblock %}
+```

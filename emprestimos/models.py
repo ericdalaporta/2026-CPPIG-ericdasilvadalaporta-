@@ -1,9 +1,7 @@
-from django.db import models
 from datetime import date
 
-# a lógica eh, um emprestimo pode ter vários 
-# ItemEmprestimo apontando pra várias CopiaChave
-# e cada ItemEmprestimo tem seu próprio status, multa e data de devolução
+from django.db import models
+
 
 class Emprestimo(models.Model):
 
@@ -11,7 +9,7 @@ class Emprestimo(models.Model):
         'clientes.Cliente',
         verbose_name='Cliente',
         help_text='Nome do cliente',
-        on_delete=models.PROTECT, # impedir apagar cliente com empréstimos
+        on_delete=models.PROTECT,
         related_name='emprestimos',
         null=True,
         blank=True
@@ -30,7 +28,14 @@ class Emprestimo(models.Model):
     ativo = models.BooleanField(
         'Ativo',
         default=True,
-        help_text='Se o empréstimo está em andamento ou concluído'
+        help_text='Indica se o empréstimo está em andamento'
+    )
+
+    data_conclusao = models.DateField(
+        'Data de Conclusão',
+        null=True,
+        blank=True,
+        help_text='Data em que o empréstimo foi concluído'
     )
 
     class Meta:
@@ -40,30 +45,48 @@ class Emprestimo(models.Model):
     def __str__(self):
         return f'Empréstimo {self.id}'
 
-    def dias_atraso(self): # calcula dias de atraso. Se não está ativo, sem atraso.
-        if not self.ativo:
-            return 0
+    def dias_atraso(self):
+        """
+        Enquanto estiver ativo, usa a data atual.
 
-        dias = (date.today() - self.data_prevista).days
+        Depois de concluído, usa a data de conclusão.
+        Dessa forma, a multa para de aumentar.
+        """
+
+        if self.ativo:
+            data_final = date.today()
+        else:
+            # Proteção para empréstimos antigos
+            data_final = self.data_conclusao or self.data_prevista
+
+        dias = (data_final - self.data_prevista).days
+
         return max(0, dias)
 
     def calcular_multa(self):
+        """Calcula R$ 200,00 por dia de atraso."""
+
         return self.dias_atraso() * 200
 
     def esta_atrasado(self):
+        """Retorna True se estiver ativo e atrasado."""
 
-        if self.ativo and self.dias_atraso() > 0:
-            return True # funcao que indica se o empréstimo está atrasado (ativo e com dias de atraso > 0)
+        return self.ativo and self.dias_atraso() > 0
 
-        return False # se nao entrou no if, nao ta atrasado
+    def get_status(self):
+        """Retorna o texto mostrado na tela."""
 
-    def get_status(self): # isso aparece no admin
+        if not self.ativo:
+            return 'Concluído'
 
-        if self.ativo:
-            return 'Ativo'
+        if self.esta_atrasado():
+            return 'Atrasado'
 
-        return 'Concluído'
+        return 'Em andamento'
 
+    notificacao_atraso = models.BooleanField( '''Notificação de Atraso Enviada''',
+        default=False
+    )
 
 class ItemEmprestimo(models.Model):
 
@@ -100,10 +123,10 @@ class ItemEmprestimo(models.Model):
     multa = models.FloatField(
         'Multa',
         default=0,
-        help_text='Multa por atraso deste item'
+        help_text='Multa final deste item'
     )
 
-    data_devolucao_item = models.DateField( # eh usado pra calcular multa, e pra mostrar data de devolução do item
+    data_devolucao_item = models.DateField(
         'Data de Devolução do Item',
         null=True,
         blank=True,
@@ -113,25 +136,44 @@ class ItemEmprestimo(models.Model):
     class Meta:
         verbose_name = 'Item Empréstimo'
         verbose_name_plural = 'Itens Empréstimos'
-        unique_together = ('emprestimo', 'copia_chave')
-        permissions = (('view_item_emprestimo', 'Pode visualizar itens de empréstimo'),)
+
+        unique_together = (
+            'emprestimo',
+            'copia_chave'
+        )
+
+        permissions = (
+            (
+                'view_item_emprestimo',
+                'Pode visualizar itens de empréstimo'
+            ),
+        )
 
     def __str__(self):
         return f'Item {self.id} - {self.copia_chave}'
 
-    def calcular_multa(self): #aqui tem outro cálculo de multa, específico pra cada item, baseado na data de devolução do item. 
-        # se nao devolveu, calcula com base na data prevista do empréstimo. Se devolveu, calcula com base na data de devolução do item.
-        # é necessário porque se um cliente pegar mais de uma copia chave, pode devolver uma antes da data prevista, e outra depois, e a multa tem que ser calculada separada.
-        
-        if (
-            self.data_devolucao_item is None
-            and self.emprestimo.data_prevista
-        ):
-            dias_atraso = (
-                date.today() - self.emprestimo.data_prevista
-            ).days
+    def calcular_multa(self):
+        """
+        Enquanto o item não foi devolvido, usa a data atual.
 
-            if dias_atraso > 0:
-                return dias_atraso * 200
+        Depois da devolução, usa a data de devolução e a multa
+        deixa de aumentar.
+        """
 
-        return 0
+        if self.data_devolucao_item:
+            data_final = self.data_devolucao_item
+
+        elif self.emprestimo.ativo:
+            data_final = date.today()
+
+        else:
+            data_final = (
+                self.emprestimo.data_conclusao
+                or self.emprestimo.data_prevista
+            )
+
+        dias_atraso = (
+            data_final - self.emprestimo.data_prevista
+        ).days
+
+        return max(0, dias_atraso) * 200
