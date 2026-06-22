@@ -9,11 +9,11 @@ Este repositório contém o desenvolvimento de um sistema de gerenciamento para 
 
 EM BREVE...
 
-comandos pra rodar num pc novo:
+comandos pra rodar num pc novo: estão errados e o APScheduler não está funcionando no momento.
 
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-python manage.py migrate
-.\iniciar_sistema.bat
+python.\iniciar_sistema.bat
 depois abre o http
+
