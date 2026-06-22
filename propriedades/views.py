@@ -58,3 +58,4 @@ class PropriedadeDeleteView(PermissionRequiredMixin, SuccessMessageMixin, Delete
     success_url = reverse_lazy('propriedades')
     success_message = 'Propriedade apagada com sucesso!'
     permission_required = 'propriedades.delete_propriedade'
+
