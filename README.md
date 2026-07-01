@@ -7,7 +7,17 @@ Este repositório contém o desenvolvimento de um sistema de gerenciamento para 
 ![Diagrama de Classes/UML](./diagrama-uml.png)
 
 
-EM BREVE...
+Regras de negócio:
+
+    1. Para emprestar, tem que estar devolvida
+
+    2. Histórico preservado
+
+    3. Multa pra atraso de empréstimo
+
+    4. Perdeu uma cópia? Precisa pagar
+
+    5. Recomenda pegar chave do portão
 
 comandos pra facilitar a minha vida:
 

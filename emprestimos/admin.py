@@ -15,4 +15,4 @@ class EmprestimoAdmin(admin.ModelAdmin):
 
 @admin.register(ItemEmprestimo)
 class ItemEmprestimoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'emprestimo', 'copia_chave', 'status', 'multa')
+    list_display = ('id', 'emprestimo', 'copia_chave', 'status')

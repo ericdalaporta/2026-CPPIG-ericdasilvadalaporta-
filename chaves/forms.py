@@ -9,6 +9,7 @@ class ChaveModelForm(forms.ModelForm): #cria um formulario baseado no model chav
 
         error_messages = {
             'nome': {'required': 'O Nome da chave é um campo obrigatório'},
+            'propriedade': {'required': 'A Propriedade é um campo obrigatório'},
         }
 
 

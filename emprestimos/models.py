@@ -5,7 +5,7 @@ from django.db import models
 
 class Emprestimo(models.Model):
 
-    cliente = models.ForeignKey(
+    cliente = models.ForeignKey( # diz que um cliente pode ter vários empréstimos
         'clientes.Cliente',
         verbose_name='Cliente',
         help_text='Nome do cliente',
@@ -46,35 +46,36 @@ class Emprestimo(models.Model):
         return f'Empréstimo {self.id}'
 
     def dias_atraso(self):
-        """
-        Enquanto estiver ativo, usa a data atual.
+        
+        # enquanto estiver ativo, usa a data atual, depois de concluído,
+        # usa a data de conclusão, dessa forma, a multa para de aumentar
+        
 
-        Depois de concluído, usa a data de conclusão.
-        Dessa forma, a multa para de aumentar.
-        """
-
-        if self.ativo:
+        if self.ativo: # se o emprestimo ainda ta ativo, usa a data de hoje
             data_final = date.today()
         else:
-            # Proteção para empréstimos antigos
+            # se nao ta ativo, foi concluido, daí usa
+            # data_conclusao, se nao tiver data_conclusao, usa data_prevista
             data_final = self.data_conclusao or self.data_prevista
+            # bota o valor pra dentro de data_final, se data_conclusao for None, usa data_prevista
 
         dias = (data_final - self.data_prevista).days
-
-        return max(0, dias)
+        # depois faz a diferença entre a data_final e a data_prevista, pega os dias de diferença
+        
+        return max(0, dias) #aí retorna aqui a quantridade de dias de atraso
 
     def calcular_multa(self):
-        """Calcula R$ 200,00 por dia de atraso."""
+        # Calcula R$ 200,00 por dia de atraso.
 
-        return self.dias_atraso() * 200
+        return self.dias_atraso() * 200 # usei a funcao dias_atraso e multipliquei pela diaria
 
-    def esta_atrasado(self):
-        """Retorna True se estiver ativo e atrasado."""
+    def esta_atrasado(self): 
+        # retorna true se emprestimo estiver ativo e atrasado
 
-        return self.ativo and self.dias_atraso() > 0
+        return self.ativo and self.dias_atraso() > 0 
 
     def get_status(self):
-        """Retorna o texto mostrado na tela."""
+        # retorna o texto do status do emprestimo
 
         if not self.ativo:
             return 'Concluído'
@@ -84,53 +85,36 @@ class Emprestimo(models.Model):
 
         return 'Em andamento'
 
-    notificacao_atraso = models.BooleanField( '''Notificação de Atraso Enviada''',
+    notificacao_atraso = models.BooleanField( "Notificação de Atraso Enviada",
         default=False
-    )
+    ) # controla o envio do email de notificação de atraso, pra não enviar várias vezes
+    # no scheduler, ele procura apenas emprestimos com notificacao_atraso = False, e envia o email, depois muda pra True, pra não enviar de novo
 
-class ItemEmprestimo(models.Model):
+class ItemEmprestimo(models.Model): # representa uma copia dentro de um empréstimo
 
-    STATUS_CHOICES = [
+    STATUS_CHOICES = [ # define valores permitidos pro campo status, o primeiro
+                      # valor vai pro banco, o segundo pro usuário (não implementado ainda)
         ('EMPRESTADA', 'Emprestada'),
         ('DEVOLVIDA', 'Devolvida'),
         ('PERDIDA', 'Perdida'),
     ]
 
-    emprestimo = models.ForeignKey(
+    emprestimo = models.ForeignKey( # diz que um emprestimo pode ter vários itens, e cada item pertence a um emprestimo
         Emprestimo,
-        verbose_name='Empréstimo',
-        help_text='Empréstimo relacionado',
         on_delete=models.CASCADE,
         related_name='itens'
     )
 
-    copia_chave = models.ForeignKey(
+    copia_chave = models.ForeignKey( # diz que uma copia de chave pode estar em vários itens de emprestimo, e cada item pertence a uma copia de chave
         'chaves.CopiaChave',
-        verbose_name='Cópia de Chave',
-        help_text='Cópia de chave emprestada',
         on_delete=models.PROTECT,
         related_name='itens_emprestimo'
     )
 
     status = models.CharField(
-        'Status',
         max_length=20,
         choices=STATUS_CHOICES,
-        default='EMPRESTADA',
-        help_text='Status do item no empréstimo'
-    )
-
-    multa = models.FloatField(
-        'Multa',
-        default=0,
-        help_text='Multa final deste item'
-    )
-
-    data_devolucao_item = models.DateField(
-        'Data de Devolução do Item',
-        null=True,
-        blank=True,
-        help_text='Data em que este item foi devolvido'
+        default='EMPRESTADA'
     )
 
     class Meta:
@@ -142,38 +126,16 @@ class ItemEmprestimo(models.Model):
             'copia_chave'
         )
 
-        permissions = (
-            (
-                'view_item_emprestimo',
-                'Pode visualizar itens de empréstimo'
-            ),
-        )
-
     def __str__(self):
         return f'Item {self.id} - {self.copia_chave}'
+    
+    multa = models.FloatField( # guarda a multa daquela copia dentro do emprestimo
+                              # nem isso nem o campo abaixo precisa estar no trabalho final
+                              # pq todas as copias sao entregues juntas
+    default=0
+    )
 
-    def calcular_multa(self):
-        """
-        Enquanto o item não foi devolvido, usa a data atual.
-
-        Depois da devolução, usa a data de devolução e a multa
-        deixa de aumentar.
-        """
-
-        if self.data_devolucao_item:
-            data_final = self.data_devolucao_item
-
-        elif self.emprestimo.ativo:
-            data_final = date.today()
-
-        else:
-            data_final = (
-                self.emprestimo.data_conclusao
-                or self.emprestimo.data_prevista
-            )
-
-        dias_atraso = (
-            data_final - self.emprestimo.data_prevista
-        ).days
-
-        return max(0, dias_atraso) * 200
+    data_devolucao_item = models.DateField(
+    null=True,
+    blank=True
+    )

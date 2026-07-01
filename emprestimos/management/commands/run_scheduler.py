@@ -10,13 +10,15 @@ from emprestimos.models import Emprestimo
 
 def verificar_atrasos():
 
-    emprestimos_atrasados = Emprestimo.objects.filter(
+    emprestimos_atrasados = Emprestimo.objects.filter( # aqui ele ve o banco de dados e pega todos os emprestimos que estão atrasados, 
+        # ou seja, que ainda estão ativos, a data prevista de devolução é menor que a data atual e que ainda não foi enviado email de atraso
         ativo=True,
-        data_prevista__lt=date.today(),
+        data_prevista__lt=date.today(), #lt = menor que
         notificacao_atraso=False
     )
+    
 
-    for emprestimo in emprestimos_atrasados:
+    for emprestimo in emprestimos_atrasados: # passa por cada emprestimo atrasado e envia email de aviso de atraso
 
         send_mail(
             'Empréstimo atrasado',
@@ -29,7 +31,7 @@ def verificar_atrasos():
             [emprestimo.cliente.email]
         )
 
-        emprestimo.notificacao_atraso = True
+        emprestimo.notificacao_atraso = True # marca que o email foi enviado e salva o emprestimo
         emprestimo.save()
 
 

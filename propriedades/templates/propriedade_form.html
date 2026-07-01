@@ -14,10 +14,11 @@
                 
                 {% bootstrap_field form.tipo %}  <!--id_tipo foi criado automaticamente pelo django -->
                 
-                <!-- portão associado (Condicional para Chalé Exclusivo) -->
+                <!-- portão associado (Condicional para Chalé Exclusivo), none significa nao mostrar -->
                 <div id="portao-field" style="display: none;">
                     {% bootstrap_field form.portao_associado %}
-                </div>
+                </div> 
+                <!-- quando escolho chale_exclusivo, vira display block e o campo aparece-->
 
 
                 
@@ -35,12 +36,16 @@
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() { 
 
-    const tipoSelect = document.getElementById('id_tipo'); // cria var TipoSelect e guarda o elemento html nela
+    const tipoSelect = document.getElementById('id_tipo'); 
+
+    // procura no html o id="id_tipo" que é o select do tipo de prop
     const portaoField = document.getElementById('portao-field');
 
-    tipoSelect.addEventListener('change', function() { //quando muda o valor do select executa
+    
+    tipoSelect.addEventListener('change', function() { 
+        // fica observando o tipoSelect, se mudar, dispara a função abaixo
 
         if (tipoSelect.value === 'CHALE_EXCLUSIVO') {
             portaoField.style.display = 'block';

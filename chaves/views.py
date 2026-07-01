@@ -2,9 +2,14 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
+
+# Adicionado por ultimo, identifica o erro causado pelo models.PROTECT
+from django.db.models.deletion import ProtectedError
+
+# ADICIONADO: permite voltar para a listagem
+from django.shortcuts import redirect
 
 from .models import Chave, CopiaChave
 from .forms import ChaveModelForm, CopiaChaveModelForm
@@ -13,7 +18,7 @@ from .forms import ChaveModelForm, CopiaChaveModelForm
 class ChavesView(PermissionRequiredMixin, ListView):
     model = Chave
     template_name = 'chaves.html'
-    context_object_name = 'object_list' #pro template conseguir acessar a lista de chaves como object_list
+    context_object_name = 'object_list'
     paginate_by = 10
     permission_required = 'chaves.view_chave'
 
@@ -28,11 +33,21 @@ class ChavesView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         if not context['object_list'] and self.request.GET.get('buscar'):
-            messages.info(self.request, 'Não existem chaves cadastradas com esse nome!')
+            messages.info(
+                self.request,
+                'Não existem chaves cadastradas com esse nome!'
+            )
+
         return context
 
-class ChaveAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+
+class ChaveAddView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    CreateView
+):
     model = Chave
     form_class = ChaveModelForm
     template_name = 'chave_form.html'
@@ -41,7 +56,11 @@ class ChaveAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     permission_required = 'chaves.add_chave'
 
 
-class ChaveUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
+class ChaveUpdateView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    UpdateView
+):
     model = Chave
     form_class = ChaveModelForm
     template_name = 'chave_form.html'
@@ -50,12 +69,32 @@ class ChaveUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     permission_required = 'chaves.change_chave'
 
 
-class ChaveDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+class ChaveDeleteView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    DeleteView
+):
     model = Chave
     template_name = 'chave_apagar.html'
     success_url = reverse_lazy('chaves')
     success_message = 'Chave apagada com sucesso!'
     permission_required = 'chaves.delete_chave'
+
+    # adicionado por ultimo, identifica o erro causado pelo models.PROTECT
+    def post(self, request, *args, **kwargs):
+        try:
+            # tenta excluir a chave normalmente.
+            return super().post(request, *args, **kwargs)
+
+        except ProtectedError:
+            # se existirem cópias ligadas à chave, mostra esta mensagem.
+            messages.error(
+                request,
+                'Não é possível apagar esta chave porque existem cópias vinculadas a ela.'
+            )
+
+            # volta para a lista de chaves.
+            return redirect('chaves')
 
 
 class CopiasChaveView(PermissionRequiredMixin, ListView):
@@ -76,11 +115,21 @@ class CopiasChaveView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         if not context['object_list'] and self.request.GET.get('buscar'):
-            messages.info(self.request, 'Não existem cópias cadastradas com esse código!')
+            messages.info(
+                self.request,
+                'Não existem cópias cadastradas com esse código!'
+            )
+
         return context
 
-class CopiaChaveAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+
+class CopiaChaveAddView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    CreateView
+):
     model = CopiaChave
     form_class = CopiaChaveModelForm
     template_name = 'copia_form.html'
@@ -89,7 +138,11 @@ class CopiaChaveAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView
     permission_required = 'chaves.add_copiachave'
 
 
-class CopiaChaveUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
+class CopiaChaveUpdateView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    UpdateView
+):
     model = CopiaChave
     form_class = CopiaChaveModelForm
     template_name = 'copia_form.html'
@@ -97,9 +150,30 @@ class CopiaChaveUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateV
     success_message = 'Cópia alterada com sucesso!'
     permission_required = 'chaves.change_copiachave'
 
-class CopiaChaveDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+
+class CopiaChaveDeleteView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    DeleteView
+):
     model = CopiaChave
     template_name = 'copia_apagar.html'
     success_url = reverse_lazy('copias')
     success_message = 'Cópia apagada com sucesso!'
     permission_required = 'chaves.delete_copiachave'
+
+    # adicionado poir ultimo, identifica o erro causado pelo models.PROTECT
+    def post(self, request, *args, **kwargs):
+        try:
+            # tenta excluir a cópia normalmente.
+            return super().post(request, *args, **kwargs)
+
+        except ProtectedError:
+            # a cópia pode estar vinculada ao histórico de um empréstimo.
+            messages.error(
+                request,
+                'Não é possível apagar esta cópia porque ela está vinculada a um empréstimo.'
+            )
+
+            # volta para a lista de cópias.
+            return redirect('copias')

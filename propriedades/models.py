@@ -11,7 +11,7 @@ class Propriedade(models.Model):
     
     tipo = models.CharField('Tipo', max_length=50, choices=TIPO_CHOICES, help_text='Tipo de propriedade') 
     
-    portao_associado = models.ForeignKey( 
+    portao_associado = models.ForeignKey(  # diz que um chalé exclusivo pode ter um portão associado, mas um portão pode ter vários chalés exclusivos
         'propriedades.Propriedade',
         verbose_name='Portão Associado',
         help_text='Portão associado a este chalé exclusivo',

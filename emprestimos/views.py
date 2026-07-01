@@ -18,12 +18,10 @@ from .models import Emprestimo, ItemEmprestimo
 from chaves.models import CopiaChave
 
 
-# =============================================
-# FUNÇÕES AUXILIARES
-# =============================================
+# funções auxiliares
 
 def atualizar_status_copias(emprestimo, novo_status):
-    """Atualiza o status de todas as cópias do empréstimo."""
+    # atualiza o status de todas as cópias do empréstimo
 
     for item in emprestimo.itens.all():
         item.copia_chave.status = novo_status
@@ -31,7 +29,7 @@ def atualizar_status_copias(emprestimo, novo_status):
 
 
 def criar_itens(emprestimo, copias_selecionadas):
-    """Cria os itens e marca as cópias como emprestadas."""
+    # cria os itens e marca as cópias como emprestadas
 
     for copia_id in copias_selecionadas:
         copia = CopiaChave.objects.get(id=copia_id)
@@ -46,31 +44,76 @@ def criar_itens(emprestimo, copias_selecionadas):
         copia.save()
 
 
-def devolver_itens(emprestimo):
-    """Devolve os itens e libera as cópias."""
+def adicionar_copias_portao(copias_selecionadas):
+    # adiciona uma cópia disponível dos portões associados
 
-    hoje = date.today()
+    ids_copias = list(copias_selecionadas)
+
+    copias = CopiaChave.objects.filter(
+        id__in=ids_copias
+    ).select_related(
+        'chave__propriedade__portao_associado'
+    )
+
+    for copia in copias:
+
+        # se a cópia não estiver ligada a uma chave, vai para a próxima
+        if copia.chave is None:
+            continue
+
+        propriedade = copia.chave.propriedade
+
+        # se a chave não estiver ligada a uma propriedade, vai para a próxima
+        if propriedade is None:
+            continue
+
+        # verifica se é um chalé exclusivo com portão associado
+        if (
+            propriedade.tipo == 'CHALE_EXCLUSIVO'
+            and propriedade.portao_associado
+        ):
+            portao = propriedade.portao_associado
+
+            # verifica se uma cópia desse portão já foi selecionada
+            portao_ja_incluido = CopiaChave.objects.filter(
+                id__in=ids_copias,
+                chave__propriedade=portao
+            ).exists()
+
+            if portao_ja_incluido:
+                continue
+
+            # procura uma cópia disponível da chave do portão
+            copia_portao = CopiaChave.objects.filter(
+                chave__propriedade=portao,
+                status='DISPONIVEL'
+            ).first()
+
+            # impede salvar caso não exista cópia disponível
+            if copia_portao is None:
+                raise ValueError(
+                    f'Não existe uma cópia disponível da chave do portão {portao.nome}.'
+                )
+
+            # adiciona a cópia do portão na lista do empréstimo
+            ids_copias.append(str(copia_portao.id))
+
+    return ids_copias
+
+
+def devolver_itens(emprestimo):
+    # marca os itens como devolvidos e libera as cópias
 
     for item in emprestimo.itens.all():
 
-        # Não altera uma data de devolução que já existia
-        if item.data_devolucao_item is None:
-            item.data_devolucao_item = hoje
-
         item.status = 'DEVOLVIDA'
-
-        # Guarda a multa final daquele item
-        item.multa = item.calcular_multa()
-
         item.copia_chave.status = 'DISPONIVEL'
 
         item.copia_chave.save()
         item.save()
 
 
-# =============================================
-# LISTAR EMPRÉSTIMOS
-# =============================================
+# listagem dos empréstimos
 
 class EmprestimosView(PermissionRequiredMixin, ListView):
 
@@ -82,8 +125,10 @@ class EmprestimosView(PermissionRequiredMixin, ListView):
     def get_queryset(self):
         termo_busca = self.request.GET.get('buscar')
 
+        # pega todos os empréstimos e mostra os mais novos primeiro
         emprestimos = Emprestimo.objects.all().order_by('-id')
 
+        # procura pelo nome do cliente ou pelo id do empréstimo
         if termo_busca:
             emprestimos = emprestimos.filter(
                 Q(cliente__nome__icontains=termo_busca)
@@ -93,9 +138,7 @@ class EmprestimosView(PermissionRequiredMixin, ListView):
         return emprestimos
 
 
-# =============================================
-# CRIAR EMPRÉSTIMO
-# =============================================
+# criação do empréstimo
 
 class EmprestimoAddView(
     PermissionRequiredMixin,
@@ -111,20 +154,43 @@ class EmprestimoAddView(
     permission_required = 'emprestimos.add_emprestimo'
 
     def form_valid(self, form):
+
+        # pega as cópias selecionadas no formulário
         copias_selecionadas = self.request.POST.getlist('copias')
 
+        # impede criar um empréstimo sem cópias
         if not copias_selecionadas:
             form.add_error(
                 None,
                 'Selecione pelo menos uma cópia de chave.'
             )
+
             return self.form_invalid(form)
 
-        form.instance.ativo = True 
-        """isso eh para garantir que o emprestimo seja criado como ativo (em andamento)"""
-        
+        # verifica se o usuário marcou a opção de incluir o portão
+        incluir_portao = self.request.POST.get('incluir_portao')
+
+        if incluir_portao:
+            try:
+                copias_selecionadas = adicionar_copias_portao(
+                    copias_selecionadas
+                )
+
+            except ValueError as erro:
+                form.add_error(
+                    None,
+                    str(erro)
+                )
+
+                return self.form_invalid(form)
+
+        # garante que o empréstimo seja criado como ativo
+        form.instance.ativo = True
+
+        # salva o empréstimo
         response = super().form_valid(form)
 
+        # cria os itens com as cópias selecionadas
         criar_itens(
             self.object,
             copias_selecionadas
@@ -133,9 +199,7 @@ class EmprestimoAddView(
         return response
 
 
-# =============================================
-# EDITAR EMPRÉSTIMO
-# =============================================
+# edição do empréstimo
 
 class EmprestimoUpdateView(
     PermissionRequiredMixin,
@@ -152,28 +216,48 @@ class EmprestimoUpdateView(
 
     def form_valid(self, form):
 
+        # pega as cópias selecionadas no formulário
         copias_selecionadas = self.request.POST.getlist('copias')
 
+        # impede salvar sem selecionar alguma cópia
         if not copias_selecionadas:
             form.add_error(
                 None,
                 'Selecione pelo menos uma cópia de chave.'
             )
+
             return self.form_invalid(form)
 
-        # Libera as cópias antigas
+        # verifica se o usuário marcou a opção de incluir o portão
+        incluir_portao = self.request.POST.get('incluir_portao')
+
+        if incluir_portao:
+            try:
+                copias_selecionadas = adicionar_copias_portao(
+                    copias_selecionadas
+                )
+
+            except ValueError as erro:
+                form.add_error(
+                    None,
+                    str(erro)
+                )
+
+                return self.form_invalid(form)
+
+        # libera as cópias antigas
         atualizar_status_copias(
             self.object,
             'DISPONIVEL'
         )
 
-        # Remove os itens antigos
+        # remove os itens antigos
         self.object.itens.all().delete()
 
-        # Salva as alterações do empréstimo
+        # salva as alterações
         response = super().form_valid(form)
 
-        # Cria os novos itens
+        # cria os itens novamente com as cópias escolhidas
         criar_itens(
             self.object,
             copias_selecionadas
@@ -182,9 +266,7 @@ class EmprestimoUpdateView(
         return response
 
 
-# =============================================
-# DELETAR EMPRÉSTIMO
-# =============================================
+# exclusão do empréstimo
 
 class EmprestimoDeleteView(
     PermissionRequiredMixin,
@@ -200,7 +282,7 @@ class EmprestimoDeleteView(
 
     def form_valid(self, form):
 
-        # Libera as cópias antes de apagar
+        # libera as cópias antes de apagar o empréstimo
         atualizar_status_copias(
             self.object,
             'DISPONIVEL'
@@ -209,28 +291,26 @@ class EmprestimoDeleteView(
         return super().form_valid(form)
 
 
-# =============================================
-# CONCLUIR EMPRÉSTIMO
-# =============================================
+# conclusão do empréstimo
 
 class EmprestimoToggleDisponibilidadeView(
     PermissionRequiredMixin,
     View
 ):
-    """
-    O nome foi mantido para não quebrar a URL existente.
 
-    Agora essa view apenas conclui o empréstimo.
-    Ela não permite reativar o empréstimo.
-    """
+    # o nome foi mantido para não quebrar a url existente
+    # essa view apenas conclui o empréstimo
+    # ela não permite reativar um empréstimo concluído
 
     permission_required = 'emprestimos.change_emprestimo'
 
     def post(self, request, pk):
 
         try:
+            # busca o empréstimo pelo id
             emprestimo = Emprestimo.objects.get(pk=pk)
 
+            # se já estiver concluído, apenas retorna sucesso
             if not emprestimo.ativo:
                 return JsonResponse({
                     'success': True,
@@ -239,12 +319,15 @@ class EmprestimoToggleDisponibilidadeView(
                     'multa': emprestimo.calcular_multa()
                 })
 
-            # Guarda o dia em que a multa deve parar
+            # marca o empréstimo como concluído
             emprestimo.ativo = False
+
+            # guarda a data em que a multa deve parar de aumentar
             emprestimo.data_conclusao = date.today()
+
             emprestimo.save()
 
-            # Devolve as chaves
+            # devolve os itens e libera as cópias
             devolver_itens(emprestimo)
 
             return JsonResponse({
@@ -254,12 +337,14 @@ class EmprestimoToggleDisponibilidadeView(
                 'multa': emprestimo.calcular_multa()
             })
 
+        # acontece quando não existe empréstimo com esse id
         except Emprestimo.DoesNotExist:
             return JsonResponse({
                 'success': False,
                 'error': 'Empréstimo não encontrado.'
             }, status=404)
 
+        # captura qualquer outro erro
         except Exception as erro:
             return JsonResponse({
                 'success': False,

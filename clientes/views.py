@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
+from django.db.models.deletion import ProtectedError
+
 from .models import Cliente
 from .forms import ClienteModelForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -64,12 +66,22 @@ class ClienteDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView
     success_message = 'Cliente apagado com sucesso'
     permission_required = 'clientes.delete_cliente'
 
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
 
-def enviar_cobranca_chave_perdida(request, pk): # Envia email de cobrança por chave perdida
-    """
-    Envia email de cobrança ao cliente por chave perdida
-    """
-    # Busca o cliente no banco de dados pelo ID (pk)
+        except ProtectedError:
+            messages.error(
+                request,
+                'Não é possível apagar este cliente porque ele possui empréstimos ou reservas vinculados.'
+            )
+
+            return redirect('clientes')
+
+
+def enviar_cobranca_chave_perdida(request, pk): # manda email de cobrança por chave perdida
+
+    # busca o cliente no banco de dados pelo ID (pk)
     # Se não encontrar, retorna erro 404
     cliente = get_object_or_404(Cliente, pk=pk)
     
@@ -85,6 +97,9 @@ def enviar_cobranca_chave_perdida(request, pk): # Envia email de cobrança por c
     
     # Renderiza o template HTML (arquivo .html) com formatação bonita
     html_email = render_to_string('emails/texto_email.html', dados)
+    
+    # As duas versões do email (texto puro e HTML) são enviadas para o cliente
+    # Aí o app de email escolhe mostrar (depende do que ele suporta)
     
     # Envia o email para o cliente
     send_mail(

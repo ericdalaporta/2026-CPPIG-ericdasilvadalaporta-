@@ -2,10 +2,12 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models.deletion import ProtectedError
+from django.shortcuts import redirect
 
 from .models import Propriedade
 from .forms import PropriedadeModelForm
-from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 class PropriedadesView(PermissionRequiredMixin, ListView):
@@ -18,9 +20,12 @@ class PropriedadesView(PermissionRequiredMixin, ListView):
         buscar = self.request.GET.get('buscar')
 
         if buscar:
-            return Propriedade.objects.filter(nome__icontains=buscar)
+            return Propriedade.objects.filter(
+                nome__icontains=buscar
+            )
 
-        return super().get_queryset() #se nao tiver busca chama o queryset normal, que é pegar tudo
+        # Se não tiver busca, pega todas as propriedades.
+        return super().get_queryset()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,7 +39,12 @@ class PropriedadesView(PermissionRequiredMixin, ListView):
         return context
 
 
-class PropriedadeAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+class PropriedadeAddView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    CreateView
+):
+    
     model = Propriedade
     form_class = PropriedadeModelForm
     template_name = 'propriedade_form.html'
@@ -43,7 +53,11 @@ class PropriedadeAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateVie
     permission_required = 'propriedades.add_propriedade'
 
 
-class PropriedadeUpdateView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
+class PropriedadeUpdateView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    UpdateView
+):
     model = Propriedade
     form_class = PropriedadeModelForm
     template_name = 'propriedade_form.html'
@@ -52,10 +66,27 @@ class PropriedadeUpdateView(PermissionRequiredMixin, SuccessMessageMixin, Update
     permission_required = 'propriedades.change_propriedade'
 
 
-class PropriedadeDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+class PropriedadeDeleteView(
+    PermissionRequiredMixin,
+    SuccessMessageMixin,
+    DeleteView
+):
     model = Propriedade
     template_name = 'propriedade_apagar.html'
     success_url = reverse_lazy('propriedades')
     success_message = 'Propriedade apagada com sucesso!'
     permission_required = 'propriedades.delete_propriedade'
 
+    def post(self, request, *args, **kwargs):
+        try:
+            # Tenta apagar a propriedade normalmente.
+            return super().post(request, *args, **kwargs)
+
+        except ProtectedError:
+            # Aparece se existirem chaves ligadas à propriedade.
+            messages.error(
+                request,
+                'Não é possível apagar esta propriedade porque existem chaves vinculadas a ela.'
+            )
+
+            return redirect('propriedades')

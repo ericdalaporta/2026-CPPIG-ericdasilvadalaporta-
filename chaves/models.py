@@ -10,14 +10,13 @@ class Chave(models.Model):
         help_text='Nome do modelo da chave'
     )
 
-    propriedade = models.ForeignKey( 
+    propriedade = models.ForeignKey(  # diz que uma chave pertence a uma propriedade
+        # uma propriedade pode ter várias chaves
         'propriedades.Propriedade',
         verbose_name='Propriedade', 
         help_text='Propriedade relacionada', 
         on_delete=models.PROTECT,
         related_name='chaves',
-        null=True, 
-        blank=True
     )
 
     class Meta:
@@ -42,14 +41,13 @@ class CopiaChave(models.Model):
         help_text='Código da cópia da chave'
     )
     
-    chave = models.ForeignKey( 
+    chave = models.ForeignKey( # uma cópia pertence a uma chave
+        # uma chave pode ter várias cópias
         Chave,
         verbose_name='Chave', 
         help_text='Chave relacionada', 
         on_delete=models.PROTECT,
         related_name='copias',
-        null=True, 
-        blank=True
     )
     
     status = models.CharField( # armazena a opcao do status_choice no banco de dados
