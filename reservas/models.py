@@ -11,7 +11,9 @@ class Reserva(models.Model):
         blank=True
     )
     
-    # ✅ MUDANÇA: De ForeignKey para ManyToManyField
+    # MUDANÇA dee ForeignKey para ManyToMany
+    # significa que uma reserva pode ter várias chaves e uma chave
+    # varias reservas
     chaves = models.ManyToManyField(
         'chaves.Chave',
         verbose_name='Chaves',

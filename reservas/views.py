@@ -9,7 +9,7 @@ from .forms import ReservaModelForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
-class ReservasView(PermissionRequiredMixin, ListView):
+class ReservasView(PermissionRequiredMixin, ListView): # a reserva eh buscada apenas pelo cliente__nome__icontains
     model = Reserva
     template_name = 'reservas.html'
     context_object_name = 'object_list'
@@ -21,20 +21,20 @@ class ReservasView(PermissionRequiredMixin, ListView):
         qs = Reserva.objects.all()
 
         if buscar:
-            qs = qs.filter(
-                Q(cliente__nome__icontains=buscar) |
-                Q(propriedade__nome__icontains=buscar) |
-                Q(id__icontains=buscar)
-            )
+            qs = qs.filter(cliente__nome__icontains=buscar)
 
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if not context['object_list'] and self.request.GET.get('buscar'):
-            messages.info(self.request, 'Não existem reservas cadastradas com esse critério!')
-        return context
 
+        if not context['object_list'] and self.request.GET.get('buscar'):
+            messages.info(
+                self.request,
+                'Não existem reservas cadastradas para esse cliente!'
+            )
+
+        return context
 
 class ReservaAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     model = Reserva

@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db.models import Q
 
 from .models import Emprestimo, ItemEmprestimo
@@ -7,15 +6,17 @@ from chaves.models import CopiaChave
 
 
 class EmprestimoModelForm(forms.ModelForm):
-    copias = forms.ModelMultipleChoiceField( # pode selecionar varias copias
-        queryset=CopiaChave.objects.filter(status='DISPONIVEL'), # mostra só as cópias disponíveis
+
+    # campo extra que permite selecionar várias cópias.
+    copias = forms.ModelMultipleChoiceField(
+        queryset=CopiaChave.objects.filter(status='DISPONIVEL'),
         required=False,
         label='Cópias de Chave'
     )
-    
+
     class Meta:
-        model = Emprestimo # diz que esse form é baseado no model Emprestimo
-        #daí cria os campos do form com base nos campos do model
+        # este form cria ou edita um Emprestimo.
+        model = Emprestimo
 
         fields = [
             'cliente',
@@ -24,42 +25,51 @@ class EmprestimoModelForm(forms.ModelForm):
         ]
 
         widgets = {
-            'data_retirada': forms.DateInput(attrs={'type': 'date'}),
-            'data_prevista': forms.DateInput(attrs={'type': 'date'}),
+            'data_retirada': forms.DateInput(
+                attrs={'type': 'date'}
+            ),
+            'data_prevista': forms.DateInput(
+                attrs={'type': 'date'}
+            ),
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # o init serve pra caso criar emprestimo = mostra copias disponiveis
-        # e pra caso estiver editando, mostra as disponiveis + as que já estão vinculadas ao emprestimo
-       
-        if self.instance.pk: # se o emprestimo ja existe, mostra as copias disponiveis + as que já estão vinculadas ao emprestimo
-        # se lê como "se esse empréstimo já tem ID, ele existe e tá sendo editado"
-        
-            copias_vinculadas = self.instance.itens.values_list(
-                'copia_chave_id',
-                flat=True
+
+        # se o empréstimo já possui ID, ele está sendo editado.
+        if self.instance.pk:
+
+            # pega os IDs das cópias que já pertencem ao empréstimo.
+            copias_vinculadas = list(
+                self.instance.itens.values_list(
+                    'copia_chave_id',
+                    flat=True
+                )
             )
-            # pegue os itens desse emprestimos e guarde os id das copias vinculadas, pra poder pré-selecionar no form e mostrar no queryset
 
+            # mostra as cópias disponíveis e as cópias já vinculadas.
             self.fields['copias'].queryset = CopiaChave.objects.filter(
-                Q(status='DISPONIVEL') |
-                Q(id__in=copias_vinculadas)
-            ).distinct() # define quais copias vao aparecer no form de acordo com o filtro
-            # o filtro mostra disponiveis ou as que ja tao vinculadas ao emprestimo
+                Q(status='DISPONIVEL')
+                | Q(id__in=copias_vinculadas)
+            )
 
+            # deixa marcadas as cópias que já estão no empréstimo.
+            self.fields['copias'].initial = copias_vinculadas
 
         else:
-            # Novo: mostrar só disponível
+            # ao criar um empréstimo, mostra somente cópias disponíveis.
             self.fields['copias'].queryset = CopiaChave.objects.filter(
                 status='DISPONIVEL'
             )
-    
+
+
 class ItemEmprestimoModelForm(forms.ModelForm):
-    # itemEmprestimo é a relação entre emprestimo e copia de chave, então esse form serve pra editar o status do item emprestimo, que é o status da copia de chave vinculada ao emprestimo
-    # ou seja, é a tabela intermediária entre emprestimo e copia de chave, que tem o status da copia de chave vinculada ao emprestimo
-    # O ItemEmprestimo também guarda informações extras, como status, multa e data de devolução.
+
+    # permite editar a cópia e o status de um ItemEmprestimo.
     class Meta:
         model = ItemEmprestimo
-        fields = ['copia_chave', 'status']
+
+        fields = [
+            'copia_chave',
+            'status',
+        ]

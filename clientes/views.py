@@ -1,3 +1,5 @@
+import email
+
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
@@ -81,38 +83,32 @@ class ClienteDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView
 
 def enviar_cobranca_chave_perdida(request, pk): # manda email de cobrança por chave perdida
 
-    # busca o cliente no banco de dados pelo ID (pk)
-    # Se não encontrar, retorna erro 404
+    # busca cliente pelo id
     cliente = get_object_or_404(Cliente, pk=pk)
     
-    # Cria uma lista com o email do cliente
+    # cria uma lista com o email do cliente porque o send_email espera uma lista (mesmo que seja só um email)
     email = []
     email.append(cliente.email)
     
     # Prepara os dados que vão ser usados nos templates de email
     dados = {'cliente': cliente}
     
-    # Renderiza o template de texto puro (arquivo .txt)
+    # renderiza o template de texto puro ou em html bonitao, depende do app do usuario
     texto_email = render_to_string('emails/texto_email.txt', dados)
-    
-    # Renderiza o template HTML (arquivo .html) com formatação bonita
     html_email = render_to_string('emails/texto_email.html', dados)
     
-    # As duas versões do email (texto puro e HTML) são enviadas para o cliente
-    # Aí o app de email escolhe mostrar (depende do que ele suporta)
-    
-    # Envia o email para o cliente
+
     send_mail(
-        subject='Cobrança por Chave Perdida - Chale',  # Assunto do email
-        message=texto_email,  # Corpo do email em texto puro
-        from_email='ericdasilvadalaporta@gmail.com',  # Email de origem
-        recipient_list=email,  # Lista de destinatários
-        html_message=html_email,  # Versão HTML do email
-        fail_silently=False,  # Se False, mostra erro caso falhe
+        subject='Cobrança por Chave Perdida - Chale',  
+        message=texto_email,  
+        from_email='ericdasilvadalaporta@gmail.com',
+        recipient_list=email,  
+        html_message=html_email, 
+        fail_silently=False,  # se False, mostra erro caso falhe
     )
     
-    # Mostra mensagem de sucesso ao usuário
+    # mostra mensagem de sucesso ao usuário
     messages.success(request, f'Email de cobrança enviado para {cliente.email}')
     
-    # Redireciona de volta para a lista de clientes
+    # redireciona de volta para a lista de clientes
     return redirect('clientes')

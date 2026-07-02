@@ -7,7 +7,7 @@ class PropriedadeModelForm(forms.ModelForm):
     class Meta:
         model = Propriedade
 
-        fields = '__all__'
+        fields = '__all__' # pega todos os campos de models e faz o form automaticamente
 
         error_messages = {
             

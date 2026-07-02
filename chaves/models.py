@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Chave(models.Model):
     
     nome = models.CharField(
@@ -50,7 +49,8 @@ class CopiaChave(models.Model):
         related_name='copias',
     )
     
-    status = models.CharField( # armazena a opcao do status_choice no banco de dados
+    status = models.CharField( # armazena a opcao do status_choice no banco de dados, é importante pra saber se a copia ta disponivel, emprestada ou perdida
+                              # esse status é usado na lógica de emprestimos pra saber se a copia pode ser emprestada ou não
         'Status', 
         max_length=20, 
         choices=STATUS_CHOICES, 

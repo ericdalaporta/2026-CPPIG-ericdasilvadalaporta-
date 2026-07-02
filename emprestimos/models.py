@@ -47,7 +47,7 @@ class Emprestimo(models.Model):
 
     def dias_atraso(self):
         
-        # enquanto estiver ativo, usa a data atual, depois de concluído,
+        # enquanto estiver ativo, usa a data atual. depois de concluído,
         # usa a data de conclusão, dessa forma, a multa para de aumentar
         
 
@@ -65,12 +65,11 @@ class Emprestimo(models.Model):
         return max(0, dias) #aí retorna aqui a quantridade de dias de atraso
 
     def calcular_multa(self):
-        # Calcula R$ 200,00 por dia de atraso.
 
         return self.dias_atraso() * 200 # usei a funcao dias_atraso e multipliquei pela diaria
 
     def esta_atrasado(self): 
-        # retorna true se emprestimo estiver ativo e atrasado
+        # retorna true se emprestimo estiver ativo e , eh usado pra mostrar o status do emprestimo na tabela de emprestimos
 
         return self.ativo and self.dias_atraso() > 0 
 
@@ -92,8 +91,7 @@ class Emprestimo(models.Model):
 
 class ItemEmprestimo(models.Model): # representa uma copia dentro de um empréstimo
 
-    STATUS_CHOICES = [ # define valores permitidos pro campo status, o primeiro
-                      # valor vai pro banco, o segundo pro usuário (não implementado ainda)
+    STATUS_CHOICES = [ # valor vai pro banco, o segundo pro usuário (não implementado ainda)
         ('EMPRESTADA', 'Emprestada'),
         ('DEVOLVIDA', 'Devolvida'),
         ('PERDIDA', 'Perdida'),

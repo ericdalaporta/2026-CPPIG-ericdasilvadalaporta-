@@ -24,7 +24,7 @@ class PropriedadesView(PermissionRequiredMixin, ListView):
                 nome__icontains=buscar
             )
 
-        # Se não tiver busca, pega todas as propriedades.
+        # se não tiver busca, pega todas as propriedades.
         return super().get_queryset()
 
     def get_context_data(self, **kwargs):
