@@ -12,11 +12,13 @@
                 <label class="col-md-2 col-form-label fw-bold">Buscar:</label>
 
                 <div class="col-md-8">
-                    <input class="form-control"
-                           type="text"
-                           name="buscar"
-                           value="{{ request.GET.buscar }}"
-                           placeholder="Digite o ID, cliente ou propriedade">
+                    <input
+                        class="form-control"
+                        type="text"
+                        name="buscar"
+                        value="{{ request.GET.buscar }}"
+                        placeholder="Digite o ID, cliente ou chave"
+                    >
                 </div>
 
                 <div class="col-md-2">
@@ -40,10 +42,11 @@
                         <thead class="table-primary">
                             <tr>
                                 <th>Cliente</th>
-                                <th>Data Início</th>
-                                <th>Data Fim</th>
+                                <th>Início</th>
+                                <th>Fim</th>
                                 <th>Status</th>
-                                <th style="width: 150px;">Ações</th>
+                                <th>Empréstimo</th>
+                                <th style="width: 190px;">Ações</th>
                             </tr>
                         </thead>
 
@@ -59,116 +62,69 @@
                                     </td>
 
                                     <td>
-                                        {{ reserva.data_inicio|date:"d/m/Y" }}
+                                        {{ reserva.data_inicio|date:"d/m/Y H:i" }}
                                     </td>
 
                                     <td>
-                                        {{ reserva.data_fim|date:"d/m/Y" }}
+                                        {{ reserva.data_fim|date:"d/m/Y H:i" }}
                                     </td>
 
                                     <td>
-                                        {{ reserva.status }}
+                                        <span class="badge bg-{{ reserva.get_status_badge }}">
+                                            {{ reserva.get_status_display }}
+                                        </span>
                                     </td>
 
                                     <td>
-                                        <a href="{% url 'reserva_editar' reserva.pk %}"
-                                           class="text-primary me-2"
-                                           title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
+                                        {% if reserva.emprestimo_gerado %}
+                                            #{{ reserva.emprestimo_gerado.id }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
 
-                                        <a href="{% url 'reserva_apagar' reserva.pk %}"
-                                           class="text-danger me-2"
-                                           title="Deletar">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
+                                    <td>
+                                        {% if reserva.esta_ativa %}
+                                            <a href="{% url 'reserva_editar' reserva.pk %}"
+                                               class="text-primary me-2"
+                                               title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <a href="{% url 'reserva_apagar' reserva.pk %}"
+                                               class="text-danger me-2"
+                                               title="Cancelar">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        {% endif %}
 
                                         <a href="#"
                                            data-bs-toggle="modal"
                                            data-bs-target="#modal{{ reserva.id }}"
-                                           class="text-secondary"
+                                           class="text-secondary me-2"
                                            title="Ver detalhes">
                                             <i class="fas fa-eye"></i>
                                         </a>
+
+                                        {% if reserva.pode_converter_em_emprestimo %}
+                                            <form method="POST"
+                                                  action="{% url 'reserva_converter_emprestimo' reserva.pk %}"
+                                                  style="display: inline;">
+                                                {% csrf_token %}
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-success"
+                                                        title="Transformar em empréstimo"
+                                                        onclick="return confirm('Deseja transformar esta reserva em empréstimo?')">
+                                                    Emprestar
+                                                </button>
+                                            </form>
+                                        {% endif %}
                                     </td>
                                 </tr>
-
-                                <div class="modal fade"
-                                     id="modal{{ reserva.id }}"
-                                     tabindex="-1">
-
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">
-                                                    Reserva #{{ reserva.id }}
-                                                </h5>
-
-                                                <button type="button"
-                                                        class="btn-close"
-                                                        data-bs-dismiss="modal">
-                                                </button>
-                                            </div>
-
-                                            <div class="modal-body">
-
-                                                <p>
-                                                    <strong>Cliente:</strong>
-
-                                                    {% if reserva.cliente %}
-                                                        {{ reserva.cliente.nome }}
-                                                    {% else %}
-                                                        <span class="text-muted">-</span>
-                                                    {% endif %}
-                                                </p>
-
-                                                <h6 class="mt-3 mb-2">
-                                                    Chaves Reservadas:
-                                                </h6>
-
-                                                <ul style="margin-bottom: 0;">
-                                                    {% for chave in reserva.chaves.all %}
-                                                        <li>{{ chave.nome }}</li>
-                                                    {% empty %}
-                                                        <li class="text-muted">
-                                                            Nenhuma chave vinculada.
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-
-                                                <p class="mt-3">
-                                                    <strong>Data Início:</strong>
-                                                    {{ reserva.data_inicio|date:"d/m/Y" }}
-                                                </p>
-
-                                                <p>
-                                                    <strong>Data Fim:</strong>
-                                                    {{ reserva.data_fim|date:"d/m/Y" }}
-                                                </p>
-
-                                                <p>
-                                                    <strong>Status:</strong>
-                                                    {{ reserva.status }}
-                                                </p>
-
-                                            </div>
-
-                                            <div class="modal-footer">
-                                                <button class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">
-                                                    Fechar
-                                                </button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
                             {% empty %}
                                 <tr>
-                                    <td colspan="5"
-                                        class="text-center text-muted">
+                                    <td colspan="6" class="text-center text-muted">
                                         Nenhuma reserva cadastrada
                                     </td>
                                 </tr>
@@ -179,11 +135,108 @@
                 </div>
             </div>
 
-            <!-- paginacao -->
             <div class="d-flex justify-content-center mt-3">
                 {% bootstrap_pagination page_obj %}
             </div>
         </div>
+
+        {% for reserva in object_list %}
+            <div class="modal fade" id="modal{{ reserva.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                Reserva #{{ reserva.id }}
+                            </h5>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal">
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p>
+                                <strong>Cliente:</strong>
+                                {% if reserva.cliente %}
+                                    {{ reserva.cliente.nome }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </p>
+
+                            <p>
+                                <strong>Início:</strong>
+                                {{ reserva.data_inicio|date:"d/m/Y H:i" }}
+                            </p>
+
+                            <p>
+                                <strong>Fim:</strong>
+                                {{ reserva.data_fim|date:"d/m/Y H:i" }}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>
+                                <span class="badge bg-{{ reserva.get_status_badge }}">
+                                    {{ reserva.get_status_display }}
+                                </span>
+                            </p>
+
+                            {% if reserva.emprestimo_gerado %}
+                                <p>
+                                    <strong>Empréstimo gerado:</strong>
+                                    #{{ reserva.emprestimo_gerado.id }}
+                                </p>
+                            {% endif %}
+
+                            <h6 class="mt-3 mb-2">
+                                Chaves Reservadas:
+                            </h6>
+
+                            <ul style="margin-bottom: 0;">
+                                {% for chave in reserva.chaves.all %}
+                                    <li>{{ chave.nome }}</li>
+                                {% empty %}
+                                    <li class="text-muted">
+                                        Nenhuma chave vinculada.
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            {% if reserva.observacao %}
+                                <p class="mt-3">
+                                    <strong>Observação:</strong>
+                                    {{ reserva.observacao }}
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <div class="modal-footer">
+                            {% if reserva.esta_ativa %}
+                                <form method="POST"
+                                      action="{% url 'reserva_finalizar' reserva.pk %}"
+                                      style="display: inline;">
+                                    {% csrf_token %}
+
+                                    <button type="submit"
+                                            class="btn btn-outline-secondary"
+                                            onclick="return confirm('Deseja finalizar esta reserva?')">
+                                        Finalizar
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            <button class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+                                Fechar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
 
     </div>
 </section>

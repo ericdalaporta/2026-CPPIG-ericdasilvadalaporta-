@@ -7,17 +7,20 @@
 <section class="section">
     <div class="container">
 
-        <!-- Formulário de busca por nome do cliente -->
         <form method="GET">
             <div class="row p-3 align-items-center">
-
                 <label class="col-md-2 col-form-label fw-bold">
                     Buscar:
                 </label>
 
                 <div class="col-md-8">
-                    <input class="form-control" type="text" name="buscar" value="{{ request.GET.buscar }}"
-                        placeholder="Digite o nome do cliente">
+                    <input
+                        class="form-control"
+                        type="text"
+                        name="buscar"
+                        value="{{ request.GET.buscar }}"
+                        placeholder="Digite o nome do cliente"
+                    >
                 </div>
 
                 <div class="col-md-2">
@@ -25,17 +28,14 @@
                         Buscar
                     </button>
                 </div>
-
             </div>
         </form>
 
-        <!-- Formulário escondido usado somente para gerar o token CSRF -->
         <form id="csrf-form" style="display: none;">
             {% csrf_token %}
         </form>
 
         <div class="card shadow mt-3">
-
             <div class="card-body">
 
                 <h3 class="text-center mb-4">
@@ -43,120 +43,97 @@
                 </h3>
 
                 <div class="table-responsive">
-
                     <table class="table table-hover align-middle text-center">
 
                         <thead class="table-primary">
                             <tr>
                                 <th>Cliente</th>
-                                <th>Data Retirada</th>
-                                <th>Data Prevista</th>
+                                <th>Retirada</th>
+                                <th>Prevista</th>
                                 <th>Status</th>
+                                <th>Atraso</th>
                                 <th>Multa</th>
-                                <th style="width: 150px;">Ações</th>
+                                <th style="width: 170px;">Ações</th>
                             </tr>
                         </thead>
 
                         <tbody>
-
                             {% for emprestimo in object_list %}
-
-                            <tr>
-
-                                <td>
-                                    {{ emprestimo.cliente.nome }}
-                                </td>
-
-                                <td>
-                                    {{ emprestimo.data_retirada|date:"d/m/Y" }}
-                                </td>
-
-                                <td>
-                                    {{ emprestimo.data_prevista|date:"d/m/Y" }}
-                                </td>
-
-                                <td>
-
-                                    <!-- ao clicar no status, o empréstimo será concluído -->
-                                    <span class="status-text" data-emprestimo-id="{{ emprestimo.id }}"
-                                        data-ativo="{{ emprestimo.ativo|yesno:'true,false' }}"
-                                        style="cursor: pointer; user-select: none;" title="Clique para concluir">
-
-                                        {% if emprestimo.esta_atrasado %}
-
-                                        <span class="badge bg-danger">
-                                            Atrasado
-                                            ({{ emprestimo.dias_atraso }}d)
-                                        </span>
-
-                                        {% elif emprestimo.ativo %}
-
-                                        <span class="badge bg-warning">
-                                            Em andamento
-                                        </span>
-
+                                <tr>
+                                    <td>
+                                        {% if emprestimo.cliente %}
+                                            {{ emprestimo.cliente.nome }}
                                         {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
 
-                                        <span class="badge bg-success">
-                                            Concluído
+                                    <td>
+                                        {{ emprestimo.data_retirada|date:"d/m/Y H:i" }}
+                                    </td>
+
+                                    <td>
+                                        {{ emprestimo.data_prevista|date:"d/m/Y H:i" }}
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            class="status-text"
+                                            data-emprestimo-id="{{ emprestimo.id }}"
+                                            data-ativo="{{ emprestimo.ativo|yesno:'true,false' }}"
+                                            style="cursor: pointer; user-select: none;"
+                                            title="Clique para concluir"
+                                        >
+                                            <span class="badge bg-{{ emprestimo.get_status_badge }}">
+                                                {{ emprestimo.get_status }}
+                                            </span>
                                         </span>
+                                    </td>
 
+                                    <td>
+                                        {% if emprestimo.tempo_atraso > 0 %}
+                                            {{ emprestimo.get_atraso_formatado }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if emprestimo.calcular_multa > 0 %}
+                                            R$ {{ emprestimo.calcular_multa|floatformat:2 }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if emprestimo.status == emprestimo.STATUS_EM_ANDAMENTO %}
+                                            <a href="{% url 'emprestimo_editar' emprestimo.pk %}" class="text-primary me-2" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                         {% endif %}
 
-                                    </span>
+                                        {% if emprestimo.status == emprestimo.STATUS_EM_ANDAMENTO %}
+                                            <a href="{% url 'emprestimo_apagar' emprestimo.pk %}" class="text-danger me-2" title="Cancelar">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        {% endif %}
 
-                                </td>
-
-                                <td>
-
-                                    {% if emprestimo.calcular_multa > 0 %}
-
-                                    R$
-                                    {{ emprestimo.calcular_multa|floatformat:2 }}
-
-                                    {% else %}
-
-                                    -
-
-                                    {% endif %}
-
-                                </td>
-
-                                <td>
-
-                                    <a href="{% url 'emprestimo_editar' emprestimo.pk %}" class="text-primary me-2"
-                                        title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-
-                                    <a href="{% url 'emprestimo_apagar' emprestimo.pk %}" class="text-danger me-2"
-                                        title="Deletar">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ emprestimo.id }}"
-                                        class="text-secondary" title="Ver detalhes">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
-                                </td>
-
-                            </tr>
-
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ emprestimo.id }}" class="text-secondary" title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
                             {% empty %}
-
-                            <tr>
-                                <td colspan="6" class="text-center text-muted">
-                                    Nenhum empréstimo cadastrado
-                                </td>
-                            </tr>
-
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">
+                                        Nenhum empréstimo cadastrado
+                                    </td>
+                                </tr>
                             {% endfor %}
-
                         </tbody>
 
                     </table>
-
                 </div>
 
             </div>
@@ -164,140 +141,280 @@
             <div class="d-flex justify-content-center mt-3">
                 {% bootstrap_pagination page_obj %}
             </div>
-
         </div>
 
-        <!-- modais com os detalhes dos empréstimos -->
         {% for emprestimo in object_list %}
+            <div class="modal fade" id="modal{{ emprestimo.id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
 
-        <div class="modal fade" id="modal{{ emprestimo.id }}" tabindex="-1">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                Empréstimo #{{ emprestimo.id }}
+                            </h5>
 
-            <div class="modal-dialog">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
 
-                <div class="modal-content">
+                        <div class="modal-body">
+                            <p>
+                                <strong>Cliente:</strong>
+                                {% if emprestimo.cliente %}
+                                    {{ emprestimo.cliente.nome }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </p>
 
-                    <div class="modal-header">
+                            <p>
+                                <strong>Retirada:</strong>
+                                {{ emprestimo.data_retirada|date:"d/m/Y H:i" }}
+                            </p>
 
-                        <h5 class="modal-title">
-                            Empréstimo #{{ emprestimo.id }}
-                        </h5>
+                            <p>
+                                <strong>Prevista:</strong>
+                                {{ emprestimo.data_prevista|date:"d/m/Y H:i" }}
+                            </p>
 
-                        <button type="button" class="btn-close" data-bs-dismiss="modal">
-                        </button>
+                            {% if emprestimo.data_conclusao %}
+                                <p>
+                                    <strong>Conclusão:</strong>
+                                    {{ emprestimo.data_conclusao|date:"d/m/Y H:i" }}
+                                </p>
+                            {% endif %}
+
+                            {% if emprestimo.data_cancelamento %}
+                                <p>
+                                    <strong>Cancelamento:</strong>
+                                    {{ emprestimo.data_cancelamento|date:"d/m/Y H:i" }}
+                                </p>
+                            {% endif %}
+
+                            <p>
+                                <strong>Status:</strong>
+                                <span class="badge bg-{{ emprestimo.get_status_badge }}">
+                                    {{ emprestimo.get_status }}
+                                </span>
+                            </p>
+
+                            <p>
+                                <strong>Atraso:</strong>
+                                {{ emprestimo.get_atraso_formatado }}
+                            </p>
+
+                            <p>
+                                <strong>Multa:</strong>
+                                R$ {{ emprestimo.calcular_multa|floatformat:2 }}
+                            </p>
+
+                            <h6 class="mt-3 mb-2">
+                                Cópias de Chave Emprestadas:
+                            </h6>
+
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Chave</th>
+                                            <th>Código</th>
+                                            <th>Status</th>
+                                            <th>Devolução</th>
+                                            <th>Perda</th>
+                                            <th>Cobrança</th>
+                                            <th>Ação</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for item in emprestimo.itens.all %}
+                                            <tr>
+                                                <td>
+                                                    {{ item.copia_chave.chave.nome }}
+                                                </td>
+
+                                                <td>
+                                                    {{ item.copia_chave.codigo }}
+                                                </td>
+
+                                                <td>
+                                                    <span class="badge bg-{{ item.get_status_badge }}">
+                                                        {{ item.get_status_display }}
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    {% if item.data_devolucao_item %}
+                                                        {{ item.data_devolucao_item|date:"d/m/Y H:i" }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+
+                                                <td>
+                                                    {% if item.data_perda_item %}
+                                                        {{ item.data_perda_item|date:"d/m/Y H:i" }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+
+                                                <td>
+                                                    {% if item.valor_cobranca_perda > 0 %}
+                                                        R$ {{ item.valor_cobranca_perda|floatformat:2 }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+
+                                                <td>
+                                                    {% if emprestimo.status == emprestimo.STATUS_EM_ANDAMENTO and item.status == item.STATUS_EMPRESTADA %}
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-sm btn-outline-danger marcar-perdida-btn"
+                                                            data-item-id="{{ item.id }}"
+                                                        >
+                                                            Perdida
+                                                        </button>
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="7" class="text-muted">
+                                                    Nenhuma cópia encontrada.
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {% if emprestimo.motivo_cancelamento %}
+                                <p class="mt-3">
+                                    <strong>Motivo do cancelamento:</strong>
+                                    {{ emprestimo.motivo_cancelamento }}
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                                Fechar
+                            </button>
+                        </div>
 
                     </div>
-
-                    <div class="modal-body">
-
-                        <p>
-                            <strong>Cliente:</strong>
-                            {{ emprestimo.cliente.nome }}
-                        </p>
-
-                        <h6 class="mt-3 mb-2">
-                            Cópias de Chave Emprestadas:
-                        </h6>
-
-                        <ul style="margin-bottom: 0;">
-
-                            {% for item in emprestimo.itens.all %}
-
-                            <li>
-                                {{ item.copia_chave.chave.nome }}
-                            </li>
-
-                            {% empty %}
-
-                            <li>Nenhuma cópia encontrada.</li>
-
-                            {% endfor %}
-
-                        </ul>
-
-                    </div>
-
-                    <div class="modal-footer">
-
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">
-                            Fechar
-                        </button>
-
-                    </div>
-
                 </div>
-
             </div>
-
-        </div>
-
         {% endfor %}
 
     </div>
 </section>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const csrfToken = document.querySelector(
+        '#csrf-form input[name="csrfmiddlewaretoken"]'
+    ).value;
 
-    document.addEventListener('DOMContentLoaded', function () {
+    const statusTexts = document.querySelectorAll('.status-text');
 
-        // pega o token CSRF criado pelo formulário escondido
-        const csrfToken = document.querySelector(
-            '#csrf-form input[name="csrfmiddlewaretoken"]'
-        ).value;
+    statusTexts.forEach(function (element) {
+        element.addEventListener('click', function () {
+            if (this.dataset.ativo === 'false') {
+                return;
+            }
 
-        // pega todos os status dos empréstimos
-        const statusTexts = document.querySelectorAll('.status-text');
+            const confirmar = confirm('Deseja concluir este empréstimo agora?');
 
-        statusTexts.forEach(function (element) {
+            if (!confirmar) {
+                return;
+            }
 
-            element.addEventListener('click', function () {
+            const emprestimoId = this.dataset.emprestimoId;
 
-                // se já estiver concluído, não faz nada
-                if (this.dataset.ativo === 'false') {
-                    return;
+            fetch(`/${emprestimoId}/emprestimo/toggle-disponibilidade/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(async function (response) {
+                const texto = await response.text();
+
+                let data = {};
+
+                try {
+                    data = JSON.parse(texto);
+                } catch (erro) {
+                    throw new Error(texto || 'Resposta inválida do servidor.');
                 }
 
-                // pega o ID do empréstimo clicado
-                const emprestimoId = this.dataset.emprestimoId;
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Erro ao concluir empréstimo.');
+                }
 
-                // envia um POST para concluir o empréstimo
-                fetch(`/${emprestimoId}/emprestimo/toggle-disponibilidade/`, {
-
-                    method: 'POST',
-
-                    headers: {
-                        'X-CSRFToken': csrfToken
-                    }
-
-                })
-                    .then(function (response) {
-                        return response.json();
-                    })
-                    .then(function (data) {
-
-                        if (data.success) {
-
-                            // recarrega a página para mostrar o novo status
-                            location.reload();
-
-                        } else {
-
-                            alert('Erro: ' + data.error);
-
-                        }
-
-                    })
-                    .catch(function () {
-
-                        alert('Erro ao concluir empréstimo.');
-
-                    });
-
+                return data;
+            })
+            .then(function () {
+                location.reload();
+            })
+            .catch(function (erro) {
+                alert(erro.message);
             });
-
         });
-
     });
 
+    const botoesPerdida = document.querySelectorAll('.marcar-perdida-btn');
+
+    botoesPerdida.forEach(function (botao) {
+        botao.addEventListener('click', function () {
+            const confirmar = confirm('Confirma que esta cópia foi perdida?');
+
+            if (!confirmar) {
+                return;
+            }
+
+            const itemId = this.dataset.itemId;
+            const formData = new FormData();
+
+            formData.append('observacao', 'Marcada como perdida pela tela de empréstimos.');
+
+            fetch(`/item-emprestimo/${itemId}/perdido/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            })
+            .then(async function (response) {
+                const texto = await response.text();
+
+                let data = {};
+
+                try {
+                    data = JSON.parse(texto);
+                } catch (erro) {
+                    throw new Error(texto || 'Resposta inválida do servidor.');
+                }
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Erro ao marcar cópia como perdida.');
+                }
+
+                return data;
+            })
+            .then(function () {
+                location.reload();
+            })
+            .catch(function (erro) {
+                alert(erro.message);
+            });
+        });
+    });
+});
 </script>
 
 {% endblock %}

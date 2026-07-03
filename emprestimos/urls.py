@@ -6,6 +6,7 @@ from .views import (
     EmprestimoUpdateView,
     EmprestimoDeleteView,
     EmprestimoToggleDisponibilidadeView,
+    ItemEmprestimoPerdidoView,
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path('<int:pk>/emprestimo/editar/', EmprestimoUpdateView.as_view(), name='emprestimo_editar'),
     path('<int:pk>/emprestimo/apagar/', EmprestimoDeleteView.as_view(), name='emprestimo_apagar'),
     path('<int:pk>/emprestimo/toggle-disponibilidade/', EmprestimoToggleDisponibilidadeView.as_view(), name='emprestimo_toggle_disponibilidade'),
+    path('item-emprestimo/<int:pk>/perdido/', ItemEmprestimoPerdidoView.as_view(), name='item_emprestimo_perdido'),
 ]

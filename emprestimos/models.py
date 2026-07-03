@@ -1,11 +1,21 @@
-from datetime import date
+from decimal import Decimal, ROUND_CEILING
 
 from django.db import models
+from django.utils import timezone
 
 
 class Emprestimo(models.Model):
+    STATUS_EM_ANDAMENTO = 'EM_ANDAMENTO'
+    STATUS_CONCLUIDO = 'CONCLUIDO'
+    STATUS_CANCELADO = 'CANCELADO'
 
-    cliente = models.ForeignKey( # diz que um cliente pode ter vários empréstimos
+    STATUS_CHOICES = [
+        (STATUS_EM_ANDAMENTO, 'Em andamento'),
+        (STATUS_CONCLUIDO, 'Concluído'),
+        (STATUS_CANCELADO, 'Cancelado'),
+    ]
+
+    cliente = models.ForeignKey(
         'clientes.Cliente',
         verbose_name='Cliente',
         help_text='Nome do cliente',
@@ -15,14 +25,42 @@ class Emprestimo(models.Model):
         blank=True
     )
 
-    data_retirada = models.DateField(
-        'Data de Retirada',
-        help_text='Data da retirada do empréstimo'
+    data_retirada = models.DateTimeField(
+        'Data e Hora de Retirada',
+        help_text='Data e hora da retirada do empréstimo'
     )
 
-    data_prevista = models.DateField(
-        'Data Prevista',
-        help_text='Data prevista de devolução'
+    data_prevista = models.DateTimeField(
+        'Data e Hora Prevista',
+        help_text='Data e hora prevista de devolução'
+    )
+
+    data_conclusao = models.DateTimeField(
+        'Data e Hora de Conclusão',
+        null=True,
+        blank=True,
+        help_text='Data e hora em que o empréstimo foi concluído'
+    )
+
+    data_cancelamento = models.DateTimeField(
+        'Data e Hora de Cancelamento',
+        null=True,
+        blank=True,
+        help_text='Data e hora em que o empréstimo foi cancelado'
+    )
+
+    motivo_cancelamento = models.TextField(
+        'Motivo do Cancelamento',
+        null=True,
+        blank=True,
+        help_text='Motivo do cancelamento do empréstimo'
+    )
+
+    status = models.CharField(
+        'Status',
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_EM_ANDAMENTO
     )
 
     ativo = models.BooleanField(
@@ -31,52 +69,97 @@ class Emprestimo(models.Model):
         help_text='Indica se o empréstimo está em andamento'
     )
 
-    data_conclusao = models.DateField(
-        'Data de Conclusão',
+    valor_multa_por_hora = models.DecimalField(
+        'Valor da Multa por Hora',
+        max_digits=8,
+        decimal_places=2,
+        default=Decimal('20.00'),
+        help_text='Valor cobrado por hora de atraso'
+    )
+
+    tolerancia_minutos = models.PositiveIntegerField(
+        'Tolerância em Minutos',
+        default=15,
+        help_text='Tempo de tolerância antes de começar a contar multa'
+    )
+
+    notificacao_atraso = models.BooleanField(
+        'Notificação de Atraso Enviada',
+        default=False
+    )
+
+    data_notificacao_atraso = models.DateTimeField(
+        'Data da Notificação de Atraso',
         null=True,
-        blank=True,
-        help_text='Data em que o empréstimo foi concluído'
+        blank=True
     )
 
     class Meta:
         verbose_name = 'Empréstimo'
         verbose_name_plural = 'Empréstimos'
+        ordering = ['-id']
 
     def __str__(self):
+        if self.cliente:
+            return f'Empréstimo {self.id} - {self.cliente.nome}'
         return f'Empréstimo {self.id}'
 
+    def data_final_para_calculo(self):
+        if self.status == self.STATUS_CONCLUIDO and self.data_conclusao:
+            return self.data_conclusao
+
+        if self.status == self.STATUS_CANCELADO and self.data_cancelamento:
+            return self.data_cancelamento
+
+        return timezone.now()
+
+    def tempo_atraso(self):
+        data_final = self.data_final_para_calculo()
+
+        diferenca = data_final - self.data_prevista
+
+        segundos_tolerancia = self.tolerancia_minutos * 60
+        segundos_atraso = diferenca.total_seconds() - segundos_tolerancia
+
+        if segundos_atraso <= 0:
+            return 0
+
+        return int(segundos_atraso)
+
+    def horas_atraso(self):
+        segundos = self.tempo_atraso()
+
+        if segundos <= 0:
+            return 0
+
+        horas = Decimal(segundos) / Decimal(3600)
+
+        return int(horas.to_integral_value(rounding=ROUND_CEILING))
+
     def dias_atraso(self):
-        
-        # enquanto estiver ativo, usa a data atual. depois de concluído,
-        # usa a data de conclusão, dessa forma, a multa para de aumentar
-        
+        segundos = self.tempo_atraso()
 
-        if self.ativo: # se o emprestimo ainda ta ativo, usa a data de hoje
-            data_final = date.today()
-        else:
-            # se nao ta ativo, foi concluido, daí usa
-            # data_conclusao, se nao tiver data_conclusao, usa data_prevista
-            data_final = self.data_conclusao or self.data_prevista
-            # bota o valor pra dentro de data_final, se data_conclusao for None, usa data_prevista
+        if segundos <= 0:
+            return 0
 
-        dias = (data_final - self.data_prevista).days
-        # depois faz a diferença entre a data_final e a data_prevista, pega os dias de diferença
-        
-        return max(0, dias) #aí retorna aqui a quantridade de dias de atraso
+        return segundos // 86400
 
     def calcular_multa(self):
+        horas = self.horas_atraso()
 
-        return self.dias_atraso() * 200 # usei a funcao dias_atraso e multipliquei pela diaria
+        if horas <= 0:
+            return Decimal('0.00')
 
-    def esta_atrasado(self): 
-        # retorna true se emprestimo estiver ativo e , eh usado pra mostrar o status do emprestimo na tabela de emprestimos
+        return Decimal(horas) * self.valor_multa_por_hora
 
-        return self.ativo and self.dias_atraso() > 0 
+    def esta_atrasado(self):
+        return self.status == self.STATUS_EM_ANDAMENTO and self.tempo_atraso() > 0
 
     def get_status(self):
-        # retorna o texto do status do emprestimo
+        if self.status == self.STATUS_CANCELADO:
+            return 'Cancelado'
 
-        if not self.ativo:
+        if self.status == self.STATUS_CONCLUIDO:
             return 'Concluído'
 
         if self.esta_atrasado():
@@ -84,26 +167,54 @@ class Emprestimo(models.Model):
 
         return 'Em andamento'
 
-    notificacao_atraso = models.BooleanField( "Notificação de Atraso Enviada",
-        default=False
-    ) # controla o envio do email de notificação de atraso, pra não enviar várias vezes
-    # no scheduler, ele procura apenas emprestimos com notificacao_atraso = False, e envia o email, depois muda pra True, pra não enviar de novo
+    def get_status_badge(self):
+        if self.status == self.STATUS_CANCELADO:
+            return 'secondary'
 
-class ItemEmprestimo(models.Model): # representa uma copia dentro de um empréstimo
+        if self.status == self.STATUS_CONCLUIDO:
+            return 'success'
 
-    STATUS_CHOICES = [ # valor vai pro banco, o segundo pro usuário (não implementado ainda)
-        ('EMPRESTADA', 'Emprestada'),
-        ('DEVOLVIDA', 'Devolvida'),
-        ('PERDIDA', 'Perdida'),
+        if self.esta_atrasado():
+            return 'danger'
+
+        return 'warning'
+
+    def get_atraso_formatado(self):
+        segundos = self.tempo_atraso()
+
+        if segundos <= 0:
+            return 'Sem atraso'
+
+        horas = segundos // 3600
+        minutos = (segundos % 3600) // 60
+
+        if horas and minutos:
+            return f'{horas}h {minutos}min'
+
+        if horas:
+            return f'{horas}h'
+
+        return f'{minutos}min'
+
+
+class ItemEmprestimo(models.Model):
+    STATUS_EMPRESTADA = 'EMPRESTADA'
+    STATUS_DEVOLVIDA = 'DEVOLVIDA'
+    STATUS_PERDIDA = 'PERDIDA'
+
+    STATUS_CHOICES = [
+        (STATUS_EMPRESTADA, 'Emprestada'),
+        (STATUS_DEVOLVIDA, 'Devolvida'),
+        (STATUS_PERDIDA, 'Perdida'),
     ]
 
-    emprestimo = models.ForeignKey( # diz que um emprestimo pode ter vários itens, e cada item pertence a um emprestimo
+    emprestimo = models.ForeignKey(
         Emprestimo,
         on_delete=models.CASCADE,
         related_name='itens'
     )
 
-    copia_chave = models.ForeignKey( # diz que uma copia de chave pode estar em vários itens de emprestimo, e cada item pertence a uma copia de chave
+    copia_chave = models.ForeignKey(
         'chaves.CopiaChave',
         on_delete=models.PROTECT,
         related_name='itens_emprestimo'
@@ -112,13 +223,44 @@ class ItemEmprestimo(models.Model): # representa uma copia dentro de um emprést
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='EMPRESTADA'
+        default=STATUS_EMPRESTADA
+    )
+
+    data_devolucao_item = models.DateTimeField(
+        'Data e Hora de Devolução do Item',
+        null=True,
+        blank=True
+    )
+
+    data_perda_item = models.DateTimeField(
+        'Data e Hora da Perda',
+        null=True,
+        blank=True
+    )
+
+    multa = models.DecimalField(
+        'Multa',
+        max_digits=8,
+        decimal_places=2,
+        default=Decimal('0.00')
+    )
+
+    valor_cobranca_perda = models.DecimalField(
+        'Valor de Cobrança por Perda',
+        max_digits=8,
+        decimal_places=2,
+        default=Decimal('0.00')
+    )
+
+    observacao = models.TextField(
+        'Observação',
+        null=True,
+        blank=True
     )
 
     class Meta:
         verbose_name = 'Item Empréstimo'
         verbose_name_plural = 'Itens Empréstimos'
-
         unique_together = (
             'emprestimo',
             'copia_chave'
@@ -126,14 +268,12 @@ class ItemEmprestimo(models.Model): # representa uma copia dentro de um emprést
 
     def __str__(self):
         return f'Item {self.id} - {self.copia_chave}'
-    
-    multa = models.FloatField( # guarda a multa daquela copia dentro do emprestimo
-                              # nem isso nem o campo abaixo precisa estar no trabalho final
-                              # pq todas as copias sao entregues juntas
-    default=0
-    )
 
-    data_devolucao_item = models.DateField(
-    null=True,
-    blank=True
-    )
+    def get_status_badge(self):
+        if self.status == self.STATUS_DEVOLVIDA:
+            return 'success'
+
+        if self.status == self.STATUS_PERDIDA:
+            return 'danger'
+
+        return 'warning'

@@ -3,108 +3,150 @@
 
 {% block content %}
 <div class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 200px);">
-<div class="card shadow-lg m-3 col-md-6">
-    <div class="card-body">
-        <div class="row">
-            <h3 class="text-center mb-4">Cadastro de Empréstimo</h3>
-            <form method="POST" enctype="multipart/form-data" novalidate>
-                {% csrf_token %}
-                
-                {% bootstrap_field form.cliente %}
-                
-                {% bootstrap_field form.data_retirada %}
-                
-                {% bootstrap_field form.data_prevista %}
-                
-                <!-- cópias de chave com checkboxes -->
-                <div class="mb-3">
-                    <label class="form-label">Cópias de Chave <span class="text-danger">*</span></label>
-                    {% if form.copias.errors %}
-                        <div class="text-danger small">{{ form.copias.errors }}</div>
+    <div class="card shadow-lg m-3 col-md-8">
+        <div class="card-body">
+            <div class="row">
+                <h3 class="text-center mb-4">Cadastro de Empréstimo</h3>
+
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
-                    <div class="row g-3 mt-1">
+
+                    {% bootstrap_field form.cliente %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% bootstrap_field form.data_retirada %}
+                        </div>
+
+                        <div class="col-md-6">
+                            {% bootstrap_field form.data_prevista %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% bootstrap_field form.valor_multa_por_hora %}
+                        </div>
+
+                        <div class="col-md-6">
+                            {% bootstrap_field form.tolerancia_minutos %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Cópias de Chave <span class="text-danger">*</span>
+                        </label>
+
+                        {% if form.copias.errors %}
+                            <div class="text-danger small">
+                                {{ form.copias.errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-3 mt-1">
                             {% for copia in form.copias.field.queryset %}
                                 <div class="col-md-6">
-                                    <div class="form-check">
-                                        <input 
-                                            class="form-check-input copia-checkbox" 
-                                            type="checkbox" 
-                                            name="copias" 
-                                            value="{{ copia.id }}" 
+                                    <div class="form-check border rounded p-2 ps-4">
+                                        <input
+                                            class="form-check-input copia-checkbox"
+                                            type="checkbox"
+                                            name="copias"
+                                            value="{{ copia.id }}"
                                             id="id_copias_{{ forloop.counter }}"
                                             data-propriedade-id="{{ copia.chave.propriedade.id }}"
                                             data-propriedade-tipo="{{ copia.chave.propriedade.tipo }}"
                                             data-portao-nome="{% if copia.chave.propriedade.portao_associado %}{{ copia.chave.propriedade.portao_associado.nome }}{% endif %}"
-                                            {% if copia.id in form.copias.value|safe %}checked{% endif %}
+                                            {% if copia.id|stringformat:"s" in copias_selecionadas %}checked{% endif %}
                                         >
+
                                         <label class="form-check-label" for="id_copias_{{ forloop.counter }}">
-                                            {{ copia.chave.nome }} (Cód: {{ copia.codigo }})
+                                            {{ copia.chave.nome }} - Cód: {{ copia.codigo }}
                                         </label>
+
+                                        <div class="small text-muted">
+                                            Status: {{ copia.get_status_display }}
+                                        </div>
                                     </div>
                                 </div>
                             {% empty %}
-                                <p class="text-muted">Nenhuma cópia disponível</p>
+                                <p class="text-muted">Nenhuma cópia disponível.</p>
                             {% endfor %}
                         </div>
-                    <small class="form-text text-muted d-block mt-2">Selecione uma ou mais cópias. Ao selecionar um Chalé Exclusivo, você pode incluir a chave do Portão automaticamente</small>
-                    {% if form.non_field_errors %}
-                        <div class="invalid-feedback d-block">
-                            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Checkbox Portão (Condicional) -->
-                <div id="portao-field" style="display: none;">
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="incluir_portao" id="incluir_portao">
-                            <label class="form-check-label" for="incluir_portao">
-                                Incluir chave do portão <strong id="portao-nome"></strong> automaticamente
-                            </label>
+
+                        <small class="form-text text-muted d-block mt-2">
+                            Se uma cópia de Chalé Exclusivo for selecionada, o sistema pode incluir a chave do portão automaticamente.
+                        </small>
+                    </div>
+
+                    <div id="portao-field" style="display: none;">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="incluir_portao" id="incluir_portao">
+
+                                <label class="form-check-label" for="incluir_portao">
+                                    Incluir chave do portão
+                                    <strong id="portao-nome"></strong>
+                                    automaticamente
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="text-end mt-3">
-                    <button class="btn btn-primary" type="submit">Salvar</button>
-                    <a href="{% url 'emprestimos' %}" class="btn btn-secondary text-white" type="button">
-                        <span class="text">Cancelar</span>
-                    </a>
-                </div>
-            </form>
+
+                    <div class="text-end mt-3">
+                        <button class="btn btn-primary" type="submit">
+                            Salvar
+                        </button>
+
+                        <a href="{% url 'emprestimos' %}" class="btn btn-secondary text-white" type="button">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+
+            </div>
         </div>
     </div>
 </div>
-</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const copiaCheckboxes = document.querySelectorAll('.copia-checkbox');
     const portaoField = document.getElementById('portao-field');
     const portaoNome = document.getElementById('portao-nome');
     const incluirPortaoCheck = document.getElementById('incluir_portao');
-    
+
     function verificarChaleExclusivo() {
         let temChaleExclusivo = false;
         let primeiroPortao = '';
-        
-        // Verificar se alguma checkbox selecionada é de Chalé Exclusivo com portão
+
         for (let checkbox of copiaCheckboxes) {
-            if (checkbox.checked) {
-                const tipo = checkbox.dataset.propriedadeTipo;
-                const portao = checkbox.dataset.portaoNome;
-                
-                if (tipo === 'CHALE_EXCLUSIVO' && portao) {
-                    temChaleExclusivo = true;
-                    if (!primeiroPortao) {
-                        primeiroPortao = portao;
-                    }
-                    break;
+            if (!checkbox.checked) {
+                continue;
+            }
+
+            const tipo = checkbox.dataset.propriedadeTipo;
+            const portao = checkbox.dataset.portaoNome;
+
+            if (tipo === 'CHALE_EXCLUSIVO' && portao) {
+                temChaleExclusivo = true;
+
+                if (!primeiroPortao) {
+                    primeiroPortao = portao;
                 }
+
+                break;
             }
         }
-        
+
         if (temChaleExclusivo && primeiroPortao) {
             portaoNome.textContent = primeiroPortao;
             portaoField.style.display = 'block';
@@ -113,12 +155,11 @@ document.addEventListener('DOMContentLoaded', function() {
             incluirPortaoCheck.checked = false;
         }
     }
-    
-    // Adicionar event listener a cada checkbox
-    copiaCheckboxes.forEach(checkbox => {
+
+    copiaCheckboxes.forEach(function (checkbox) {
         checkbox.addEventListener('change', verificarChaleExclusivo);
     });
-    
+
     verificarChaleExclusivo();
 });
 </script>
